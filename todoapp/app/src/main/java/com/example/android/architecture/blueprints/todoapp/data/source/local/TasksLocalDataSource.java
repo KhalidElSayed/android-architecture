@@ -28,14 +28,15 @@ import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksPersistenceContract.TaskEntry;
 import com.example.android.architecture.blueprints.todoapp.util.schedulers.BaseSchedulerProvider;
-import com.squareup.sqlbrite.BriteDatabase;
-import com.squareup.sqlbrite.SqlBrite;
+import com.squareup.sqlbrite2.BriteDatabase;
+import com.squareup.sqlbrite2.SqlBrite;
 
 import java.util.List;
 
-import rx.Completable;
-import rx.Observable;
-import rx.functions.Func1;
+import io.reactivex.Completable;
+import io.reactivex.Observable;
+import io.reactivex.Single;
+import io.reactivex.functions.Function;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -52,7 +53,7 @@ public class TasksLocalDataSource implements TasksDataSource {
     private final BriteDatabase mDatabaseHelper;
 
     @NonNull
-    private Func1<Cursor, Task> mTaskMapperFunction;
+    private Function<Cursor, Task> mTaskMapperFunction;
 
     // Prevent direct instantiation.
     private TasksLocalDataSource(@NonNull Context context,
@@ -94,7 +95,7 @@ public class TasksLocalDataSource implements TasksDataSource {
      * table is modified
      */
     @Override
-    public Observable<List<Task>> getTasks() {
+    public Single<List<Task>> getTasks() {
         String[] projection = {
                 TaskEntry.COLUMN_NAME_ENTRY_ID,
                 TaskEntry.COLUMN_NAME_TITLE,
@@ -103,7 +104,8 @@ public class TasksLocalDataSource implements TasksDataSource {
         };
         String sql = String.format("SELECT %s FROM %s", TextUtils.join(",", projection), TaskEntry.TABLE_NAME);
         return mDatabaseHelper.createQuery(TaskEntry.TABLE_NAME, sql)
-                .mapToList(mTaskMapperFunction);
+                .mapToList(mTaskMapperFunction)
+                .firstOrError();
     }
 
     @Override
@@ -136,7 +138,7 @@ public class TasksLocalDataSource implements TasksDataSource {
         return Observable.using(mDatabaseHelper::newTransaction,
                 transaction -> inTransactionInsert(tasks, transaction),
                 BriteDatabase.Transaction::end)
-                .toCompletable();
+                .ignoreElements();
     }
 
     @NonNull
@@ -145,13 +147,14 @@ public class TasksLocalDataSource implements TasksDataSource {
         checkNotNull(tasks);
         checkNotNull(transaction);
 
-        return Observable.from(tasks)
+        return Observable.fromIterable(tasks)
                 .doOnNext(task -> {
                     ContentValues values = toContentValues(task);
                     mDatabaseHelper.insert(TaskEntry.TABLE_NAME, values);
                 })
-                .doOnCompleted(transaction::markSuccessful)
-                .toList();
+                .doOnComplete(transaction::markSuccessful)
+                .toList()
+                .toObservable();
     }
 
     private ContentValues toContentValues(Task task) {

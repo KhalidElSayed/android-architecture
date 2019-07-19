@@ -27,8 +27,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import rx.Completable;
-import rx.Observable;
+import io.reactivex.Completable;
+import io.reactivex.Observable;
+import io.reactivex.Single;
 
 /**
  * Implementation of the data source that adds a latency simulating network.
@@ -64,9 +65,8 @@ public class TasksRemoteDataSource implements TasksDataSource {
     }
 
     @Override
-    public Observable<List<Task>> getTasks() {
-        return Observable
-                .from(TASKS_SERVICE_DATA.values())
+    public Single<List<Task>> getTasks() {
+        return Observable.fromIterable(TASKS_SERVICE_DATA.values())
                 .delay(SERVICE_LATENCY_IN_MILLIS, TimeUnit.MILLISECONDS)
                 .toList();
     }
@@ -88,9 +88,9 @@ public class TasksRemoteDataSource implements TasksDataSource {
 
     @Override
     public Completable saveTasks(@NonNull List<Task> tasks) {
-        return Observable.from(tasks)
+        return Observable.fromIterable(tasks)
                 .doOnNext(this::saveTask)
-                .toCompletable();
+                .ignoreElements();
     }
 
     @Override

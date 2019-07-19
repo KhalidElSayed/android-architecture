@@ -4,8 +4,8 @@ import android.support.annotation.DrawableRes;
 
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 
-import rx.functions.Action0;
-import rx.functions.Action1;
+import io.reactivex.functions.Action;
+import io.reactivex.functions.Consumer;
 
 /**
  * A task that should be displayed as an item in a list of tasks.
@@ -20,12 +20,12 @@ final class TaskItem {
     @DrawableRes
     private int mBackground;
 
-    private Action0 mOnClickAction;
+    private Action mOnClickAction;
 
-    private Action1<Boolean> mOnCheckAction;
+    private Consumer<Boolean> mOnCheckAction;
 
     public TaskItem(Task task, @DrawableRes int background,
-                    Action0 onClickAction, Action1<Boolean> onCheckAction) {
+                    Action onClickAction, Consumer<Boolean> onCheckAction) {
         mTask = task;
         mBackground = background;
         mOnClickAction = onClickAction;
@@ -43,14 +43,14 @@ final class TaskItem {
     /**
      * @return the action to be triggered on click events
      */
-    public Action0 getOnClickAction() {
+    public Action getOnClickAction() {
         return mOnClickAction;
     }
 
     /**
      * @return the action to be triggered when the task is checked (marked as done or active)
      */
-    public Action1<Boolean> getOnCheckAction() {
+    public Consumer<Boolean> getOnCheckAction() {
         return mOnCheckAction;
     }
 }

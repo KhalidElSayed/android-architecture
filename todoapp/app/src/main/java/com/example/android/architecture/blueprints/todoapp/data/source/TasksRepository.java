@@ -24,8 +24,9 @@ import com.example.android.architecture.blueprints.todoapp.util.schedulers.BaseS
 
 import java.util.List;
 
-import rx.Completable;
-import rx.Observable;
+import io.reactivex.Completable;
+import io.reactivex.Observable;
+import io.reactivex.Single;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -88,7 +89,7 @@ public class TasksRepository implements TasksDataSource {
      * Gets tasks from  local data source (SQLite).
      */
     @Override
-    public Observable<List<Task>> getTasks() {
+    public Single<List<Task>> getTasks() {
         return mTasksLocalDataSource.getTasks();
     }
 
@@ -169,8 +170,8 @@ public class TasksRepository implements TasksDataSource {
     public Completable refreshTasks() {
         return mTasksRemoteDataSource.getTasks()
                 .subscribeOn(mBaseSchedulerProvider.io())
-                .doOnNext(mTasksLocalDataSource::saveTasks)
-                .toCompletable();
+                .doOnSuccess(mTasksLocalDataSource::saveTasks)
+                .ignoreElement();
     }
 
     /**

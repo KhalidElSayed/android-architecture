@@ -27,8 +27,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import rx.Completable;
-import rx.Observable;
+import io.reactivex.Completable;
+import io.reactivex.Observable;
+import io.reactivex.Single;
 
 /**
  * Implementation of a remote data source with static access to the data for easy testing.
@@ -50,9 +51,9 @@ public class FakeTasksRemoteDataSource implements TasksDataSource {
     }
 
     @Override
-    public Observable<List<Task>> getTasks() {
+    public Single<List<Task>> getTasks() {
         List<Task> values = new ArrayList<>(TASKS_SERVICE_DATA.values());
-        return Observable.just(values);
+        return Single.just(values);
     }
 
     @Override
@@ -69,9 +70,9 @@ public class FakeTasksRemoteDataSource implements TasksDataSource {
 
     @Override
     public Completable saveTasks(@NonNull List<Task> tasks) {
-        return Observable.from(tasks)
+        return Observable.fromIterable(tasks)
                 .doOnNext(this::saveTask)
-                .toCompletable();
+                .ignoreElements();
     }
 
     @Override

@@ -7,8 +7,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.annotation.VisibleForTesting;
-import android.support.v4.util.Pair;
 import android.util.Log;
+import android.util.Pair;
 
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
@@ -18,10 +18,10 @@ import com.example.android.architecture.blueprints.todoapp.util.schedulers.BaseS
 
 import java.util.List;
 
-import rx.Completable;
-import rx.Observable;
-import rx.subjects.BehaviorSubject;
-import rx.subjects.PublishSubject;
+import io.reactivex.Completable;
+import io.reactivex.Observable;
+import io.reactivex.subjects.BehaviorSubject;
+import io.reactivex.subjects.PublishSubject;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -64,8 +64,8 @@ public final class TasksViewModel {
         mNavigator = checkNotNull(navigationProvider, "Navigator cannot be null");
         mSchedulerProvider = checkNotNull(schedulerProvider, "SchedulerProvider cannot be null");
 
-        mLoadingIndicatorSubject = BehaviorSubject.create(false);
-        mFilter = BehaviorSubject.create(TasksFilterType.ALL_TASKS);
+        mLoadingIndicatorSubject = BehaviorSubject.createDefault(false);
+        mFilter = BehaviorSubject.createDefault(TasksFilterType.ALL_TASKS);
         mSnackbarText = PublishSubject.create();
     }
 
@@ -76,7 +76,7 @@ public final class TasksViewModel {
     @NonNull
     public Observable<TasksUiModel> getUiModel() {
         return getTaskItems()
-                .doOnSubscribe(() -> mLoadingIndicatorSubject.onNext(true))
+                .doOnSubscribe(disposable -> mLoadingIndicatorSubject.onNext(true))
                 .doOnNext(__ -> mLoadingIndicatorSubject.onNext(false))
                 .doOnError(__ -> mSnackbarText.onNext(R.string.loading_tasks_error))
                 .switchMap(tasks -> mFilter.map(filterType -> Pair.create(tasks, filterType)))
@@ -101,13 +101,16 @@ public final class TasksViewModel {
     }
 
     private Observable<List<TaskItem>> getTaskItems() {
-        return Observable.combineLatest(mTasksRepository.getTasks(),
+        return Observable.combineLatest(mTasksRepository.getTasks().toObservable(),
                 mFilter,
                 Pair::create)
-                .flatMap(pair -> Observable.from(pair.first)
-                        .filter(task -> shouldFilterTask(task, pair.second))
-                        .map(this::constructTaskItem)
-                        .toList());
+                .flatMap(pair -> {
+                   return Observable.fromIterable(pair.first)
+                            .filter(task -> shouldFilterTask(task, pair.second))
+                            .map(task -> constructTaskItem(task))
+                            .toList()
+                            .toObservable();
+                });
     }
 
     private NoTasksModel getNoTasksModel(TasksFilterType mCurrentFiltering) {
@@ -144,7 +147,7 @@ public final class TasksViewModel {
         checkTask.subscribeOn(mSchedulerProvider.computation())
                 .observeOn(mSchedulerProvider.computation())
                 .subscribe(
-                        //on Completed
+                        //on Complete
                         () -> {
                         },
                         // on error
@@ -154,12 +157,12 @@ public final class TasksViewModel {
 
     private Completable completeTask(Task completedTask) {
         return mTasksRepository.completeTask(completedTask)
-                .doOnCompleted(() -> mSnackbarText.onNext(R.string.task_marked_complete));
+                .doOnComplete(() -> mSnackbarText.onNext(R.string.task_marked_complete));
     }
 
     private Completable activateTask(Task activeTask) {
         return mTasksRepository.activateTask(activeTask)
-                .doOnCompleted(() -> mSnackbarText.onNext(R.string.task_marked_active));
+                .doOnComplete(() -> mSnackbarText.onNext(R.string.task_marked_active));
     }
 
     /**
@@ -271,7 +274,7 @@ public final class TasksViewModel {
      */
     @NonNull
     public Observable<Integer> getSnackbarMessage() {
-        return mSnackbarText.asObservable();
+        return mSnackbarText.hide();
     }
 
     /**
@@ -279,6 +282,6 @@ public final class TasksViewModel {
      */
     @NonNull
     public Observable<Boolean> getLoadingIndicatorVisibility() {
-        return mLoadingIndicatorSubject.asObservable();
+        return mLoadingIndicatorSubject.hide();
     }
 }

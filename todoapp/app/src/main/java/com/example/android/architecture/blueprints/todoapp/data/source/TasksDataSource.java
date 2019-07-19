@@ -22,8 +22,9 @@ import com.example.android.architecture.blueprints.todoapp.data.Task;
 
 import java.util.List;
 
-import rx.Completable;
-import rx.Observable;
+import io.reactivex.Completable;
+import io.reactivex.Observable;
+import io.reactivex.Single;
 
 /**
  * Main entry point for accessing tasks data.
@@ -32,7 +33,7 @@ import rx.Observable;
 public interface TasksDataSource {
 
     @NonNull
-    Observable<List<Task>> getTasks();
+    Single<List<Task>> getTasks();
 
     @NonNull
     Observable<Task> getTask(@NonNull String taskId);
