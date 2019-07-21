@@ -16,7 +16,6 @@
 
 package com.example.android.architecture.blueprints.todoapp.statistics;
 
-import android.support.annotation.NonNull;
 
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
@@ -24,7 +23,9 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepo
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
 import com.example.android.architecture.blueprints.todoapp.util.providers.BaseResourceProvider;
 
-import rx.Observable;
+import androidx.annotation.NonNull;
+import io.reactivex.Observable;
+import io.reactivex.Single;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -57,11 +58,11 @@ public class StatisticsViewModel {
         Observable<Task> tasks = mTasksRepository
                 .refreshTasks()
                 .andThen(mTasksRepository.getTasks()
-                        .first())
-                .flatMap(Observable::from);
+                        .toObservable())
+                .flatMap(Observable::fromIterable);
 
-        Observable<Integer> completedTasks = tasks.filter(Task::isCompleted).count();
-        Observable<Integer> activeTasks = tasks.filter(Task::isActive).count();
+        Observable<Long> completedTasks = tasks.filter(Task::isCompleted).count().toObservable();
+        Observable<Long> activeTasks = tasks.filter(Task::isActive).count().toObservable();
 
         return Observable.merge(
                 Observable.just(mResourceProvider.getString(R.string.loading)),
@@ -75,7 +76,7 @@ public class StatisticsViewModel {
     }
 
     @NonNull
-    private String getStatisticsString(int numberOfActiveTasks, int numberOfCompletedTasks) {
+    private String getStatisticsString(long numberOfActiveTasks, long numberOfCompletedTasks) {
         if (numberOfCompletedTasks == 0 && numberOfActiveTasks == 0) {
             return mResourceProvider.getString(R.string.statistics_no_tasks);
         } else {

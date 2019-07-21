@@ -1,17 +1,40 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion rootProject.ext.compileSdkVersion
-    buildToolsVersion rootProject.ext.buildToolsVersion
+    compileSdkVersion build_versions.target_sdk
+    buildToolsVersion build_versions.build_tools
 
     defaultConfig {
-        applicationId "com.example.android.architecture.blueprints.todomvp"
-        minSdkVersion rootProject.ext.minSdkVersion
-        targetSdkVersion rootProject.ext.targetSdkVersion
+        applicationId "com.example.android.architecture.blueprints.todomvvmrxjava"
+        minSdkVersion build_versions.min_sdk
+        targetSdkVersion build_versions.target_sdk
         versionCode 1
         versionName "1.0"
 
         testInstrumentationRunner 'android.support.test.runner.AndroidJUnitRunner'
+
+//        multiDexEnabled true
+    }
+
+    signingConfigs {
+        debug {
+            storeFile file('keystore/debug.keystore')
+            keyAlias 'androiddebugkey'
+            storePassword 'android'
+            keyPassword 'android'
+        }
+
+        // You must set up an environment var before release signing
+        // Run: export APP_KEY={password} for Mac
+        // Run: set APP_KEY={password} for Windows
+        // TODO Add your release keystore in /keystore folder
+        release {
+            storeFile file('keystore/release.keystore')
+            keyAlias 'releasekey'
+            storePassword "$System.env.APP_KEY"
+            keyPassword "$System.env.APP_KEY"
+            v2SigningEnabled false
+        }
     }
 
     compileOptions {
@@ -20,6 +43,14 @@ android {
     }
 
     buildTypes {
+        def BASE_URL = "BASE_URL"
+        def BASE_FILES_URL = "BASE_FILES_URL"
+
+        def configAny = { k -> "\"${project.properties.get(k)}\"" }
+        def config = { p,k -> "\"${project.properties.get(p+'.'+k)}\"" }
+        def configDebug = { k -> config('dev',k) }
+        def configRelease = { k -> config('release',k) }
+
         debug {
             // Minifying the variant used for tests is not supported when using Jack.
             minifyEnabled false
@@ -27,6 +58,13 @@ android {
             useProguard false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             testProguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguardTest-rules.pro'
+
+            versionNameSuffix " Debug"
+            debuggable true
+            testCoverageEnabled !project.hasProperty('android.injected.invoked.from.ide')
+
+//            buildConfigField "String", BASE_URL, configDebug("baseUrl")
+//            buildConfigField "String", BASE_FILES_URL, configDebug("baseFilesUrl")
         }
 
         release {
@@ -34,7 +72,16 @@ android {
             useProguard true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             testProguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguardTest-rules.pro'
+
+            debuggable false
+
+//            signingConfig signingConfigs.release
         }
+    }
+
+    sourceSets {
+        test.java.srcDirs += "src/test-common/java"
+        androidTest.java.srcDirs += "src/test-common/java"
     }
 
     // Using gradle plugin 3 you need to specify flavor dimensions.
@@ -73,41 +120,96 @@ android {
  */
 dependencies {
     // App's dependencies, including test
-    implementation "com.android.support:appcompat-v7:$rootProject.supportLibraryVersion"
-    implementation "com.android.support:cardview-v7:$rootProject.supportLibraryVersion"
-    implementation "com.android.support:design:$rootProject.supportLibraryVersion"
-    implementation "com.android.support:recyclerview-v7:$rootProject.supportLibraryVersion"
-    implementation "com.android.support:support-v4:$rootProject.supportLibraryVersion"
-    implementation "com.android.support.test.espresso:espresso-idling-resource:$rootProject.espressoVersion"
-    implementation "com.google.guava:guava:$rootProject.guavaVersion"
-    implementation "io.reactivex.rxjava2:rxjava:$rootProject.rxjavaVersion"
-    implementation "io.reactivex.rxjava2:rxandroid:$rootProject.rxandroidVersion"
-    implementation "com.squareup.sqlbrite2:sqlbrite:$rootProject.sqlbriteVersion"
+    // Support libraries
+    implementation deps.support.app_compat
+    implementation deps.support.v4
+    implementation deps.support.design
+    implementation deps.support.recyclerview
+    implementation deps.support.cardview
+
+    // Architecture components
+    implementation deps.lifecycle.runtime
+    implementation deps.lifecycle.extensions
+    annotationProcessor deps.lifecycle.compiler
+
+    // Room
+    implementation deps.room.runtime
+    implementation deps.room.rxjava2
+    annotationProcessor deps.room.compiler
+
+    // RxJava
+    implementation deps.rxjava2
+    implementation deps.rxandroid
+
+    // Dagger 2
+    implementation deps.dagger.runtime
+    implementation deps.dagger.android
+    implementation deps.dagger.android_support
+    annotationProcessor deps.dagger.compiler
+    annotationProcessor deps.dagger.android_support_compiler
+
+    // Retrofit
+    implementation deps.retrofit.runtime
+    implementation deps.retrofit.gson
+    implementation deps.retrofit.rxjava
+    implementation deps.retrofit.mock
+    implementation deps.okhttp_logging_interceptor
+
+    // Glide
+    implementation deps.glide.runtime
+    annotationProcessor deps.glide.compiler
 
     // Dependencies for local unit tests
-    testImplementation "junit:junit:$rootProject.ext.junitVersion"
-    testImplementation "org.mockito:mockito-all:$rootProject.ext.mockitoVersion"
-    testImplementation "org.hamcrest:hamcrest-all:$rootProject.ext.hamcrestVersion"
+    testImplementation deps.junit
+    testImplementation deps.hamcrest
+    testImplementation deps.arch_core.testing
+    testImplementation deps.mockito.all
+
+    // Guava
+    implementation deps.guava
+
+    // Sqlbrite 2
+    implementation deps.sqlbrite
+
+    // firebase
+    implementation deps.firebase.core
+
+    implementation deps.espresso.idling_resource
+
+    // Dependencies for local unit tests
+    testImplementation deps.junit
+    testImplementation deps.mockito.all
+    testImplementation deps.hamcrest
+    testImplementation deps.arch_core.testing
+
+    // Resolve conflicts between main and local unit tests
+    testImplementation deps.support.annotations
+    testImplementation deps.support.core_utils
 
     // Android Testing Support Library's runner and rules
-    androidTestImplementation "com.android.support.test:runner:$rootProject.ext.runnerVersion"
-    androidTestImplementation "com.android.support.test:rules:$rootProject.ext.runnerVersion"
+    androidTestImplementation deps.atsl.runner
+    androidTestImplementation deps.atsl.rules
+    androidTestImplementation deps.room.testing
+    androidTestImplementation deps.arch_core.testing
 
     // Dependencies for Android unit tests
-    androidTestImplementation "junit:junit:$rootProject.ext.junitVersion"
-    androidTestImplementation "org.mockito:mockito-core:$rootProject.ext.mockitoVersion"
-    androidTestImplementation 'com.google.dexmaker:dexmaker:1.2'
-    androidTestImplementation 'com.google.dexmaker:dexmaker-mockito:1.2'
+    androidTestImplementation deps.junit
+    androidTestImplementation deps.mockito.core, { exclude group: 'net.bytebuddy' }
+    androidTestImplementation deps.dexmaker
+    /*androidTestImplementation 'com.google.dexmaker:dexmaker:1.2'
+    androidTestImplementation 'com.google.dexmaker:dexmaker-mockito:1.2'*/
 
     // Espresso UI Testing
-    androidTestImplementation "com.android.support.test.espresso:espresso-core:$rootProject.espressoVersion"
-    androidTestImplementation "com.android.support.test.espresso:espresso-contrib:$rootProject.espressoVersion"
-    androidTestImplementation "com.android.support.test.espresso:espresso-intents:$rootProject.espressoVersion"
+    androidTestImplementation deps.espresso.core
+    androidTestImplementation deps.espresso.contrib
+    androidTestImplementation deps.espresso.intents
 
     // Resolve conflicts between main and test APK:
-    androidTestImplementation "com.android.support:support-annotations:$rootProject.supportLibraryVersion"
-    androidTestImplementation "com.android.support:support-v4:$rootProject.supportLibraryVersion"
-    androidTestImplementation "com.android.support:recyclerview-v7:$rootProject.supportLibraryVersion"
-    androidTestImplementation "com.android.support:appcompat-v7:$rootProject.supportLibraryVersion"
-    androidTestImplementation "com.android.support:design:$rootProject.supportLibraryVersion"
+    androidTestImplementation deps.support.annotations
+    androidTestImplementation deps.support.v4
+    androidTestImplementation deps.support.recyclerview
+    androidTestImplementation deps.support.app_compat
+    androidTestImplementation deps.support.design
 }
+
+//apply plugin: 'com.google.gms.google-services'

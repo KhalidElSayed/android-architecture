@@ -1,9 +1,10 @@
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
-import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
 
 import java.util.List;
+
+import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
 
 /**
  * Model for the list of tasks screen.

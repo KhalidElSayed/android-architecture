@@ -1,7 +1,8 @@
 package com.example.android.architecture.blueprints.todoapp.util.providers;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.StringRes;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.StringRes;
 
 /**
  * Resolves application's resources.

@@ -16,9 +16,6 @@
 package com.example.android.architecture.blueprints.todoapp.statistics;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,9 +25,12 @@ import android.widget.TextView;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.google.common.base.Preconditions;
 
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
-import rx.subscriptions.CompositeSubscription;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * Main UI for the statistics screen.
@@ -45,7 +45,7 @@ public class StatisticsFragment extends Fragment {
     private StatisticsViewModel mViewModel;
 
     @Nullable
-    private CompositeSubscription mSubscription;
+    private CompositeDisposable mSubscription;
 
     public static StatisticsFragment newInstance() {
         return new StatisticsFragment();
@@ -79,7 +79,7 @@ public class StatisticsFragment extends Fragment {
         Preconditions.checkNotNull(mViewModel);
         // using a CompositeSubscription to gather all the subscriptions
         // so all of them can be later unsubscribed together
-        mSubscription = new CompositeSubscription();
+        mSubscription = new CompositeDisposable();
 
         // The ViewModel holds an observable containing the state of the UI.
         // subscribe to the emissions of the UiModel
@@ -97,7 +97,7 @@ public class StatisticsFragment extends Fragment {
     private void unbindViewModel() {
         Preconditions.checkNotNull(mSubscription);
         // unsubscribing from all the subscriptions to ensure we don't have any memory leaks
-        mSubscription.unsubscribe();
+        mSubscription.dispose();
     }
 
     private void updateStatistics(@NonNull StatisticsUiModel statistics) {

@@ -17,11 +17,6 @@
 package com.example.android.architecture.blueprints.todoapp.addedittask;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,10 +24,15 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.android.architecture.blueprints.todoapp.R;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
-import rx.subscriptions.CompositeSubscription;
+import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
+import androidx.fragment.app.Fragment;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * Main UI for the add task screen. Users can enter a task title and description.
@@ -50,7 +50,7 @@ public class AddEditTaskFragment extends Fragment {
 
     private AddEditTaskViewModel mViewModel;
 
-    private CompositeSubscription mSubscription = new CompositeSubscription();
+    private CompositeDisposable mSubscription = new CompositeDisposable();
 
     public static AddEditTaskFragment newInstance(String taskId) {
         Bundle arguments = new Bundle();
@@ -92,7 +92,7 @@ public class AddEditTaskFragment extends Fragment {
     private void bindViewModel() {
         // using a CompositeSubscription to gather all the subscriptions, so all of them can be
         // later unsubscribed together
-        mSubscription = new CompositeSubscription();
+        mSubscription = new CompositeDisposable();
 
         // subscribe to the emissions of the snackbar text.
         // whenever a new snackbar text is emitted, show the snackbar
@@ -121,7 +121,7 @@ public class AddEditTaskFragment extends Fragment {
 
     private void unbindViewModel() {
         // unsubscribing from all the subscriptions to ensure we don't have any memory leaks
-        mSubscription.unsubscribe();
+        mSubscription.dispose();
     }
 
     private void restoreData(@Nullable Bundle bundle) {

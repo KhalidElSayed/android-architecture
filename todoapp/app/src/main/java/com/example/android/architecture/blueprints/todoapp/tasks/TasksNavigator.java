@@ -16,11 +16,12 @@
 
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
-import android.support.annotation.NonNull;
 
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
 import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailActivity;
 import com.example.android.architecture.blueprints.todoapp.util.providers.BaseNavigator;
+
+import androidx.annotation.NonNull;
 
 /**
  * Defines the navigation actions that can be called from the task list screen.

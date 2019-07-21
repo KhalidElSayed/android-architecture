@@ -9,9 +9,9 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import rx.Completable;
-import rx.Observable;
-import rx.observers.TestSubscriber;
+import io.reactivex.Completable;
+import io.reactivex.Observable;
+import io.reactivex.observers.TestObserver;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
@@ -34,11 +34,11 @@ public class AddEditTaskViewModelTest {
     @Mock
     private AddEditTaskNavigator mNavigator;
 
-    private TestSubscriber<AddEditTaskUiModel> mTaskTestSubscriber;
+    private TestObserver<AddEditTaskUiModel> mTaskTestSubscriber;
 
-    private TestSubscriber<Integer> mSnackbarTestSubscriber;
+    private TestObserver<Integer> mSnackbarTestSubscriber;
 
-    private TestSubscriber<Void> mCompletableTestSubscriber;
+    private TestObserver<Void> mCompletableTestSubscriber;
 
     private AddEditTaskViewModel mViewModel;
 
@@ -48,9 +48,9 @@ public class AddEditTaskViewModelTest {
         // inject the mocks in the test the initMocks method needs to be called.
         MockitoAnnotations.initMocks(this);
 
-        mTaskTestSubscriber = new TestSubscriber<>();
-        mSnackbarTestSubscriber = new TestSubscriber<>();
-        mCompletableTestSubscriber = new TestSubscriber<>();
+        mTaskTestSubscriber = new TestObserver<>();
+        mSnackbarTestSubscriber = new TestObserver<>();
+        mCompletableTestSubscriber = new TestObserver<>();
     }
 
     @Test
@@ -82,7 +82,7 @@ public class AddEditTaskViewModelTest {
         mViewModel.getUiModel().subscribe(mTaskTestSubscriber);
 
         // The correct task is emitted
-        AddEditTaskUiModel model = mTaskTestSubscriber.getOnNextEvents().get(0);
+        AddEditTaskUiModel model = mTaskTestSubscriber.values().get(0);
         assertEquals(model.getTitle(), TASK.getTitle());
         assertEquals(model.getDescription(), TASK.getDescription());
     }
@@ -196,7 +196,7 @@ public class AddEditTaskViewModelTest {
         // The navigation is triggered
         verify(mNavigator).onTaskSaved();
         // The completable completes
-        mCompletableTestSubscriber.assertCompleted();
+        mCompletableTestSubscriber.assertComplete();
     }
 
     @Test
@@ -212,7 +212,7 @@ public class AddEditTaskViewModelTest {
         mViewModel.getUiModel().subscribe(mTaskTestSubscriber);
 
         // The emitted UI model has the restored title
-        AddEditTaskUiModel model = mTaskTestSubscriber.getOnNextEvents().get(0);
+        AddEditTaskUiModel model = mTaskTestSubscriber.values().get(0);
         assertEquals(model.getTitle(), NEW_TITLE);
         assertEquals(model.getDescription(), TASK.getDescription());
     }
@@ -230,7 +230,7 @@ public class AddEditTaskViewModelTest {
         mViewModel.getUiModel().subscribe(mTaskTestSubscriber);
 
         // The emitted UI model has the restored description
-        AddEditTaskUiModel model = mTaskTestSubscriber.getOnNextEvents().get(0);
+        AddEditTaskUiModel model = mTaskTestSubscriber.values().get(0);
         assertEquals(model.getDescription(), NEW_DESCRIPTION);
         assertEquals(model.getTitle(), TASK.getTitle());
     }

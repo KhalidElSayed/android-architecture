@@ -31,9 +31,9 @@ import org.mockito.MockitoAnnotations;
 import java.util.Collections;
 import java.util.List;
 
-import rx.Completable;
-import rx.Observable;
-import rx.observers.TestSubscriber;
+import io.reactivex.Completable;
+import io.reactivex.Observable;
+import io.reactivex.observers.TestObserver;
 
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
@@ -55,7 +55,7 @@ public class TasksRepositoryTest {
 
     private TasksRepository mTasksRepository;
 
-    private TestSubscriber<List<Task>> mTasksTestSubscriber;
+    private TestObserver<List<Task>> mTasksTestSubscriber;
 
     @Mock
     private TasksDataSource mTasksRemoteDataSource;
@@ -66,7 +66,7 @@ public class TasksRepositoryTest {
     @Mock
     private Context mContext;
 
-    private TestSubscriber mTestSubscriber = new TestSubscriber();
+    private TestObserver mTestSubscriber = new TestObserver();
 
     @Before
     public void setupTasksRepository() {
@@ -78,7 +78,7 @@ public class TasksRepositoryTest {
         mTasksRepository = TasksRepository.getInstance(
                 mTasksRemoteDataSource, mTasksLocalDataSource, new ImmediateSchedulerProvider());
 
-        mTasksTestSubscriber = new TestSubscriber<>();
+        mTasksTestSubscriber = new TestObserver<>();
     }
 
     @After
@@ -113,7 +113,7 @@ public class TasksRepositoryTest {
                 .subscribe(mTestSubscriber);
 
         // Then completable completes without error
-        mTestSubscriber.assertCompleted();
+        mTestSubscriber.assertComplete();
         mTestSubscriber.assertNoErrors();
     }
 
@@ -129,7 +129,7 @@ public class TasksRepositoryTest {
                 .subscribe(mTestSubscriber);
 
         // Then completable completes without error
-        mTestSubscriber.assertCompleted();
+        mTestSubscriber.assertComplete();
         mTestSubscriber.assertNoErrors();
     }
 
@@ -145,7 +145,7 @@ public class TasksRepositoryTest {
                 .subscribe(mTestSubscriber);
 
         // The completable completes without error
-        mTestSubscriber.assertCompleted();
+        mTestSubscriber.assertComplete();
         mTestSubscriber.assertNoErrors();
     }
 
@@ -177,7 +177,7 @@ public class TasksRepositoryTest {
                 .subscribe(mTestSubscriber);
 
         // The completable completes without error
-        mTestSubscriber.assertCompleted();
+        mTestSubscriber.assertComplete();
         mTestSubscriber.assertNoErrors();
     }
 
@@ -194,7 +194,7 @@ public class TasksRepositoryTest {
                 .subscribe(mTestSubscriber);
 
         // The completable completes without error
-        mTestSubscriber.assertCompleted();
+        mTestSubscriber.assertComplete();
         mTestSubscriber.assertNoErrors();
     }
 
@@ -210,7 +210,7 @@ public class TasksRepositoryTest {
                 .subscribe(mTestSubscriber);
 
         // The completable completes without error
-        mTestSubscriber.assertCompleted();
+        mTestSubscriber.assertComplete();
         mTestSubscriber.assertNoErrors();
     }
 
@@ -308,7 +308,7 @@ public class TasksRepositoryTest {
                 .subscribe(mTasksTestSubscriber);
 
         // The correct task are emitted
-        mTasksTestSubscriber.assertCompleted();
+        mTasksTestSubscriber.assertComplete();
     }
 
 

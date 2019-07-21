@@ -1,17 +1,17 @@
 package com.example.android.architecture.blueprints.todoapp.addedittask;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
 
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.google.common.base.Strings;
 
-import rx.Completable;
-import rx.Observable;
-import rx.subjects.PublishSubject;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
+import io.reactivex.Completable;
+import io.reactivex.Observable;
+import io.reactivex.subjects.PublishSubject;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -54,7 +54,7 @@ public class AddEditTaskViewModel {
      */
     @NonNull
     public Observable<Integer> getSnackbarText() {
-        return mSnackbarText.asObservable();
+        return mSnackbarText.hide();
     }
 
     /**
@@ -100,7 +100,7 @@ public class AddEditTaskViewModel {
     @NonNull
     public Completable saveTask(String title, String description) {
         return createTask(title, description)
-                .doOnCompleted(mNavigator::onTaskSaved);
+                .doOnComplete(mNavigator::onTaskSaved);
     }
 
     private boolean isNewTask() {

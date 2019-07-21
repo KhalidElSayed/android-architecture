@@ -16,10 +16,6 @@
 
 package com.example.android.architecture.blueprints.todoapp.data;
 
-import android.support.test.InstrumentationRegistry;
-import android.support.test.runner.AndroidJUnit4;
-import android.test.suitebuilder.annotation.LargeTest;
-
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksDbHelper;
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksLocalDataSource;
@@ -33,7 +29,10 @@ import org.junit.runner.RunWith;
 
 import java.util.List;
 
-import rx.observers.TestSubscriber;
+import androidx.test.InstrumentationRegistry;
+import androidx.test.filters.LargeTest;
+import androidx.test.runner.AndroidJUnit4;
+import io.reactivex.observers.TestObserver;
 
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsCollectionContaining.hasItems;
@@ -87,9 +86,9 @@ public class TasksLocalDataSourceTest {
         mLocalDataSource.saveTask(mTask).subscribe();
 
         // Then the task can be retrieved from the persistent repository
-        TestSubscriber<Task> testSubscriber = new TestSubscriber<>();
-        mLocalDataSource.getTask(mTask.getId()).subscribe(testSubscriber);
-        testSubscriber.assertValue(mTask);
+        TestObserver<Task> testObserver = new TestObserver<>();
+        mLocalDataSource.getTask(mTask.getId()).subscribe(testObserver);
+        testObserver.assertValue(mTask);
     }
 
     @Test
@@ -101,10 +100,10 @@ public class TasksLocalDataSourceTest {
         mLocalDataSource.completeTask(mTask).subscribe();
 
         // Then the task can be retrieved from the persistent repository and is complete
-        TestSubscriber<Task> testSubscriber = new TestSubscriber<>();
-        mLocalDataSource.getTask(mTask.getId()).subscribe(testSubscriber);
-        testSubscriber.assertValueCount(1);
-        Task result = testSubscriber.getOnNextEvents().get(0);
+        TestObserver<Task> testObserver = new TestObserver<>();
+        mLocalDataSource.getTask(mTask.getId()).subscribe(testObserver);
+        testObserver.assertValueCount(1);
+        Task result = testObserver.values().get(0);
         assertThat(result.isCompleted(), is(true));
     }
 
@@ -118,10 +117,10 @@ public class TasksLocalDataSourceTest {
         mLocalDataSource.activateTask(mTask).subscribe();
 
         // Then the task can be retrieved from the persistent repository and is active
-        TestSubscriber<Task> testSubscriber = new TestSubscriber<>();
-        mLocalDataSource.getTask(mTask.getId()).subscribe(testSubscriber);
-        testSubscriber.assertValueCount(1);
-        Task result = testSubscriber.getOnNextEvents().get(0);
+        TestObserver<Task> testObserver = new TestObserver<>();
+        mLocalDataSource.getTask(mTask.getId()).subscribe(testObserver);
+        testObserver.assertValueCount(1);
+        Task result = testObserver.values().get(0);
         assertThat(result.isActive(), is(true));
         assertThat(result.isCompleted(), is(false));
     }
@@ -142,9 +141,9 @@ public class TasksLocalDataSourceTest {
         mLocalDataSource.clearCompletedTasks();
 
         // Then the completed tasks cannot be retrieved and the active one can
-        TestSubscriber<List<Task>> testSubscriber = new TestSubscriber<>();
-        mLocalDataSource.getTasks().subscribe(testSubscriber);
-        List<Task> result = testSubscriber.getOnNextEvents().get(0);
+        TestObserver<List<Task>> testObserver = new TestObserver<>();
+        mLocalDataSource.getTasks().subscribe(testObserver);
+        List<Task> result = testObserver.values().get(0);
         assertThat(result, not(hasItems(newTask1, newTask2)));
     }
 
@@ -157,9 +156,9 @@ public class TasksLocalDataSourceTest {
         mLocalDataSource.deleteAllTasks();
 
         // Then the retrieved tasks is an empty list
-        TestSubscriber<List<Task>> testSubscriber = new TestSubscriber<>();
-        mLocalDataSource.getTasks().subscribe(testSubscriber);
-        List<Task> result = testSubscriber.getOnNextEvents().get(0);
+        TestObserver<List<Task>> testObserver = new TestObserver<>();
+        mLocalDataSource.getTasks().subscribe(testObserver);
+        List<Task> result = testObserver.values().get(0);
         assertThat(result.isEmpty(), is(true));
     }
 
@@ -172,9 +171,9 @@ public class TasksLocalDataSourceTest {
         mLocalDataSource.saveTask(newTask2).subscribe();
 
         // Then the tasks can be retrieved from the persistent repository
-        TestSubscriber<List<Task>> testSubscriber = new TestSubscriber<>();
-        mLocalDataSource.getTasks().subscribe(testSubscriber);
-        List<Task> result = testSubscriber.getOnNextEvents().get(0);
+        TestObserver<List<Task>> testObserver = new TestObserver<>();
+        mLocalDataSource.getTasks().subscribe(testObserver);
+        List<Task> result = testObserver.values().get(0);
         assertThat(result, hasItems(newTask1, newTask2));
     }
 
@@ -182,26 +181,28 @@ public class TasksLocalDataSourceTest {
     public void getTask_whenTaskNotSaved() {
         //Given that no task has been saved
         //When querying for a task, null is returned.
-        TestSubscriber<Task> testSubscriber = new TestSubscriber<>();
-        mLocalDataSource.getTask("1").subscribe(testSubscriber);
-        testSubscriber.assertValue(null);
+        TestObserver<Task> testObserver = new TestObserver<>();
+        mLocalDataSource.getTask("1").subscribe(testObserver);
+
+        // TODO: the RxJava 2 change the mechanism of the item flow so we can't just emit an null values.
+        testObserver.assertValue(null);
     }
 
     @Test
     public void getTask_emits_whenNewTaskSaved() {
         // Given that we are subscribed to the list of tasks
-        TestSubscriber<List<Task>> testSubscriber = new TestSubscriber<>();
-        mLocalDataSource.getTasks().subscribe(testSubscriber);
+        TestObserver<List<Task>> testObserver = new TestObserver<>();
+        mLocalDataSource.getTasks().subscribe(testObserver);
 
         // When adding a new task
         mLocalDataSource.saveTask(mTask).subscribe();
 
         // 2 emissions are registered
-        testSubscriber.assertValueCount(2);
+        testObserver.assertValueCount(2);
         // The first one is an empty list, because the local data source was empty
-        assertThat(testSubscriber.getOnNextEvents().get(0).isEmpty(), is(true));
+        assertThat(testObserver.values().get(0).isEmpty(), is(true));
         // The 2nd one is a list containing the added task
-        List<Task> tasks = testSubscriber.getOnNextEvents().get(1);
+        List<Task> tasks = testObserver.values().get(1);
         assertThat(tasks.size(), is(1));
         assertThat(tasks.get(0), is(mTask));
     }
@@ -211,18 +212,18 @@ public class TasksLocalDataSourceTest {
         //Given that a task is saved
         mLocalDataSource.saveTask(mTask).subscribe();
         // Given that we are subscribed to the list of tasks
-        TestSubscriber<List<Task>> testSubscriber = new TestSubscriber<>();
-        mLocalDataSource.getTasks().subscribe(testSubscriber);
+        TestObserver<List<Task>> testObserver = new TestObserver<>();
+        mLocalDataSource.getTasks().subscribe(testObserver);
 
         // When adding a new task
         mLocalDataSource.completeTask(mTask).subscribe();
 
         // 2 emissions are registered
-        testSubscriber.assertValueCount(2);
+        testObserver.assertValueCount(2);
         // The first one is an empty list, because the local data source was empty
-        assertThat(testSubscriber.getOnNextEvents().get(0).get(0), is(mTask));
+        assertThat(testObserver.values().get(0).get(0), is(mTask));
         // The 2nd one is a list containing the added task
-        List<Task> tasks = testSubscriber.getOnNextEvents().get(1);
+        List<Task> tasks = testObserver.values().get(1);
         assertThat(tasks.size(), is(1));
         assertTrue(tasks.get(0).isCompleted());
     }
@@ -235,20 +236,20 @@ public class TasksLocalDataSourceTest {
         Task edited = new Task("edited", "edited", mTask.getId());
 
         // When the task is saved
-        TestSubscriber testSubscriber = new TestSubscriber();
-        mLocalDataSource.saveTask(edited).subscribe(testSubscriber);
+        TestObserver testObserver = new TestObserver();
+        mLocalDataSource.saveTask(edited).subscribe(testObserver);
 
         // No error is emitted
-        testSubscriber.assertNoErrors();
+        testObserver.assertNoErrors();
         assertTaskInLocalRepository(edited);
     }
 
     private void assertTaskInLocalRepository(Task task) {
         // Given that we are subscribed to the list of tasks
-        TestSubscriber<List<Task>> testSubscriber = new TestSubscriber<>();
-        mLocalDataSource.getTasks().subscribe(testSubscriber);
+        TestObserver<List<Task>> testObserver = new TestObserver<>();
+        mLocalDataSource.getTasks().subscribe(testObserver);
 
-        List<Task> tasks = testSubscriber.getOnNextEvents().get(0);
+        List<Task> tasks = testObserver.values().get(0);
         assertThat(tasks.size(), is(1));
         assertEquals(tasks.get(0), task);
     }

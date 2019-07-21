@@ -16,9 +16,9 @@ import org.mockito.MockitoAnnotations;
 import java.util.ArrayList;
 import java.util.List;
 
-import rx.Completable;
-import rx.Observable;
-import rx.observers.TestSubscriber;
+import io.reactivex.Completable;
+import io.reactivex.Observable;
+import io.reactivex.observers.TestObserver;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.verify;
@@ -44,7 +44,7 @@ public class StatisticsViewModelTest {
 
     private StatisticsViewModel mViewModel;
 
-    private TestSubscriber<StatisticsUiModel> mTestSubscriber;
+    private TestObserver<StatisticsUiModel> mTestSubscriber;
 
     @Before
     public void setupStatisticsPresenter() {
@@ -60,7 +60,7 @@ public class StatisticsViewModelTest {
                 new Task("Title1", "Description1"),
                 new Task("Title2", "Description2", true),
                 new Task("Title3", "Description3", true));
-        mTestSubscriber = new TestSubscriber<>();
+        mTestSubscriber = new TestObserver<>();
     }
 
     @Test
@@ -76,7 +76,7 @@ public class StatisticsViewModelTest {
 
         // One value, that contains the string loading, is emitted
         mTestSubscriber.assertValueCount(1);
-        assertEquals(mTestSubscriber.getOnNextEvents().get(0).getText(), LOADING);
+        assertEquals(mTestSubscriber.values().get(0).getText(), LOADING);
     }
 
     @Test
@@ -104,7 +104,7 @@ public class StatisticsViewModelTest {
         mViewModel.getUiModel().subscribe(mTestSubscriber);
 
         //The correct text is returned
-        String result = mTestSubscriber.getOnNextEvents().get(1).getText();
+        String result = mTestSubscriber.values().get(1).getText();
         assertEquals(result, NO_TASKS);
     }
 
@@ -121,7 +121,7 @@ public class StatisticsViewModelTest {
 
         // The initial value, false is emitted,
         // then values true and false were emitted
-        assertEquals(mTestSubscriber.getOnNextEvents().get(1).getText(), LOADING_ERROR);
+        assertEquals(mTestSubscriber.values().get(1).getText(), LOADING_ERROR);
     }
 
     private void withText(@StringRes int stringId, String returnedString) {

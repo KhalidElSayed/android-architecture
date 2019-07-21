@@ -1,10 +1,11 @@
 package com.example.android.architecture.blueprints.todoapp.util.providers;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.annotation.StringRes;
 
 import com.google.common.base.Preconditions;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.StringRes;
 
 /**
  * Concrete implementation of the {@link BaseResourceProvider} interface.

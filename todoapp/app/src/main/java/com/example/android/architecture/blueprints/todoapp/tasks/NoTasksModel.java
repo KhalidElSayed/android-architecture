@@ -1,7 +1,8 @@
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
-import android.support.annotation.DrawableRes;
-import android.support.annotation.StringRes;
+
+import androidx.annotation.DrawableRes;
+import androidx.annotation.StringRes;
 
 /**
  * The string and image that should be displayed when there are no tasks.

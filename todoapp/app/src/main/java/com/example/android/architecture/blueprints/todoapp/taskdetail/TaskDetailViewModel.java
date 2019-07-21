@@ -17,18 +17,18 @@
 package com.example.android.architecture.blueprints.todoapp.taskdetail;
 
 import android.app.Activity;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.google.common.base.Strings;
 
-import rx.Completable;
-import rx.Observable;
-import rx.subjects.BehaviorSubject;
-import rx.subjects.PublishSubject;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import io.reactivex.Completable;
+import io.reactivex.Observable;
+import io.reactivex.subjects.BehaviorSubject;
+import io.reactivex.subjects.PublishSubject;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -63,7 +63,7 @@ public class TaskDetailViewModel {
         mTaskId = taskId;
         mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null!");
         mNavigator = checkNotNull(navigator, "navigator cannot be null");
-        mLoadingSubject = BehaviorSubject.create(false);
+        mLoadingSubject = BehaviorSubject.createDefault(false);
         mSnackbarText = PublishSubject.create();
     }
 
@@ -72,7 +72,7 @@ public class TaskDetailViewModel {
      */
     @NonNull
     public Observable<Boolean> getLoadingIndicatorVisibility() {
-        return mLoadingSubject.asObservable();
+        return mLoadingSubject.hide();
     }
 
     /**
@@ -88,7 +88,7 @@ public class TaskDetailViewModel {
 
         return mTasksRepository.getTask(mTaskId)
                 .map(this::createModel)
-                .doOnSubscribe(() -> mLoadingSubject.onNext(true))
+                .doOnSubscribe(__ -> mLoadingSubject.onNext(true))
                 .doOnNext(__ -> mLoadingSubject.onNext(false));
     }
 
@@ -107,7 +107,7 @@ public class TaskDetailViewModel {
      */
     @NonNull
     public Observable<Integer> getSnackbarText() {
-        return mSnackbarText.asObservable();
+        return mSnackbarText.hide();
     }
 
     /**
@@ -175,7 +175,7 @@ public class TaskDetailViewModel {
     @NonNull
     private Completable completeTask() {
         return mTasksRepository.completeTask(mTaskId)
-                .doOnCompleted(() -> mSnackbarText.onNext(R.string.task_marked_complete));
+                .doOnComplete(() -> mSnackbarText.onNext(R.string.task_marked_complete));
     }
 
     /**
@@ -184,7 +184,7 @@ public class TaskDetailViewModel {
     @NonNull
     private Completable activateTask() {
         return mTasksRepository.activateTask(mTaskId)
-                .doOnCompleted(() -> mSnackbarText.onNext(R.string.task_marked_active));
+                .doOnComplete(() -> mSnackbarText.onNext(R.string.task_marked_active));
     }
 
 }

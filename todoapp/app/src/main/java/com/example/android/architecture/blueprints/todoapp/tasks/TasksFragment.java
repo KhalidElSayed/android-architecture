@@ -18,14 +18,6 @@ package com.example.android.architecture.blueprints.todoapp.tasks;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.PopupMenu;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -40,13 +32,21 @@ import android.widget.TextView;
 
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.data.Task;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
-import rx.subscriptions.CompositeSubscription;
+import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
+import androidx.appcompat.widget.PopupMenu;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * Display a grid of {@link Task}s. User can choose to view all, active or completed tasks.
@@ -71,7 +71,7 @@ public class TasksFragment extends Fragment {
 
     private TextView mFilteringLabelView;
 
-    private CompositeSubscription mSubscription = new CompositeSubscription();
+    private CompositeDisposable mSubscription = new CompositeDisposable();
 
     public TasksFragment() {
         // Requires empty public constructor
@@ -128,7 +128,7 @@ public class TasksFragment extends Fragment {
     private void bindViewModel() {
         // using a CompositeSubscription to gather all the subscriptions, so all of them can be
         // later unsubscribed together
-        mSubscription = new CompositeSubscription();
+        mSubscription = new CompositeDisposable();
 
         // The ViewModel holds an observable containing the state of the UI.
         // subscribe to the emissions of the Ui Model
@@ -170,7 +170,7 @@ public class TasksFragment extends Fragment {
 
     private void unbindViewModel() {
         // unsubscribing from all the subscriptions to ensure we don't have any memory leaks
-        mSubscription.unsubscribe();
+        mSubscription.dispose();
     }
 
     private void updateView(TasksUiModel model) {

@@ -18,9 +18,9 @@ import org.mockito.MockitoAnnotations;
 import java.util.ArrayList;
 import java.util.List;
 
-import rx.Completable;
-import rx.Observable;
-import rx.observers.TestSubscriber;
+import io.reactivex.Completable;
+import io.reactivex.Observable;
+import io.reactivex.observers.TestObserver;
 
 import static com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType.ACTIVE_TASKS;
 import static com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType.ALL_TASKS;
@@ -51,13 +51,13 @@ public class TasksViewModelTest {
 
     private TasksViewModel mViewModel;
 
-    private TestSubscriber<TasksUiModel> mTasksSubscriber;
+    private TestObserver<TasksUiModel> mTasksSubscriber;
 
-    private TestSubscriber<Boolean> mProgressIndicatorSubscriber;
+    private TestObserver<Boolean> mProgressIndicatorSubscriber;
 
-    private TestSubscriber<Integer> mSnackbarTextSubscriber;
+    private TestObserver<Integer> mSnackbarTextSubscriber;
 
-    private TestSubscriber mCompletableSubscriber;
+    private TestObserver mCompletableSubscriber;
 
     @Before
     public void setupTasksPresenter() {
@@ -73,10 +73,10 @@ public class TasksViewModelTest {
         TASKS = Lists.newArrayList(new Task("Title1", "Description1"),
                 new Task("Title2", "Description2", true), new Task("Title3", "Description3", true));
 
-        mTasksSubscriber = new TestSubscriber<>();
-        mProgressIndicatorSubscriber = new TestSubscriber<>();
-        mSnackbarTextSubscriber = new TestSubscriber<>();
-        mCompletableSubscriber = new TestSubscriber<>();
+        mTasksSubscriber = new TestObserver<>();
+        mProgressIndicatorSubscriber = new TestObserver<>();
+        mSnackbarTextSubscriber = new TestObserver<>();
+        mCompletableSubscriber = new TestObserver();
     }
 
     @Test
@@ -114,7 +114,7 @@ public class TasksViewModelTest {
 
         // The tasks model containing the list of tasks is emitted
         mTasksSubscriber.assertValueCount(1);
-        TasksUiModel model = mTasksSubscriber.getOnNextEvents().get(0);
+        TasksUiModel model = mTasksSubscriber.values().get(0);
         assertTasksModelWithTasksVisible(model);
     }
 
@@ -130,7 +130,7 @@ public class TasksViewModelTest {
         // and another one for the new filter
         mTasksSubscriber.assertValueCount(2);
         // And the 2nd tasks models list contains only one value
-        TasksUiModel model = mTasksSubscriber.getOnNextEvents().get(1);
+        TasksUiModel model = mTasksSubscriber.values().get(1);
         assertEquals(model.getItemList().size(), 1);
         // And the TaskItem is the active task
         assertTask(model.getItemList().get(0), TASKS.get(0), R.drawable.touch_feedback);
@@ -145,7 +145,7 @@ public class TasksViewModelTest {
         mViewModel.forceUpdateTasks().subscribe(mCompletableSubscriber);
 
         // The force update completable completes
-        mCompletableSubscriber.assertCompleted();
+        mCompletableSubscriber.assertComplete();
     }
 
     @Test
@@ -187,7 +187,7 @@ public class TasksViewModelTest {
 
         // NoTasks emits
         mTasksSubscriber.assertValueCount(1);
-        TasksUiModel model = mTasksSubscriber.getOnNextEvents().get(0);
+        TasksUiModel model = mTasksSubscriber.values().get(0);
         assertTasksModelWithNoTasksVisible(model);
         assertNoTasks(model.getNoTasksModel(), R.string.no_tasks_all,
                 R.drawable.ic_assignment_turned_in_24dp, true);
@@ -205,7 +205,7 @@ public class TasksViewModelTest {
 
         // TasksUiModel emits with no tasks
         mTasksSubscriber.assertValueCount(1);
-        TasksUiModel model = mTasksSubscriber.getOnNextEvents().get(0);
+        TasksUiModel model = mTasksSubscriber.values().get(0);
         assertTasksModelWithNoTasksVisible(model);
         assertNoTasks(model.getNoTasksModel(), R.string.no_tasks_active,
                 R.drawable.ic_check_circle_24dp, false);
@@ -223,7 +223,7 @@ public class TasksViewModelTest {
 
         // TasksUiModel emits with no tasks
         mTasksSubscriber.assertValueCount(1);
-        TasksUiModel model = mTasksSubscriber.getOnNextEvents().get(0);
+        TasksUiModel model = mTasksSubscriber.values().get(0);
         assertTasksModelWithNoTasksVisible(model);
         assertNoTasks(model.getNoTasksModel(), R.string.no_tasks_completed,
                 R.drawable.ic_verified_user_24dp, false);
@@ -262,7 +262,7 @@ public class TasksViewModelTest {
         mViewModel.filter(ALL_TASKS);
 
         // The UI model contains the correct filter text
-        TasksUiModel model = mTasksSubscriber.getOnNextEvents().get(1);
+        TasksUiModel model = mTasksSubscriber.values().get(1);
         assertEquals(model.getFilterResId(), R.string.label_all);
     }
 
@@ -275,7 +275,7 @@ public class TasksViewModelTest {
         mViewModel.filter(ACTIVE_TASKS);
 
         // The UI model contains the correct filter text
-        TasksUiModel model = mTasksSubscriber.getOnNextEvents().get(1);
+        TasksUiModel model = mTasksSubscriber.values().get(1);
         assertEquals(model.getFilterResId(), R.string.label_active);
     }
 
@@ -288,7 +288,7 @@ public class TasksViewModelTest {
         mViewModel.filter(COMPLETED_TASKS);
 
         // The UI model contains the correct filter text
-        TasksUiModel model = mTasksSubscriber.getOnNextEvents().get(1);
+        TasksUiModel model = mTasksSubscriber.values().get(1);
         assertEquals(model.getFilterResId(), R.string.label_completed);
     }
 
@@ -297,11 +297,15 @@ public class TasksViewModelTest {
         // Given a task
         withTaskInRepositoryAndSubscribed(ACTIVE_TASK);
         // And list of task items is emitted
-        List<TaskItem> items = mTasksSubscriber.getOnNextEvents().get(0).getItemList();
+        List<TaskItem> items = mTasksSubscriber.values().get(0).getItemList();
         TaskItem taskItem = items.get(0);
 
         // When triggering the click action
-        taskItem.getOnClickAction().call();
+        try {
+            taskItem.getOnClickAction().run();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         // Opening of the task details is called with the correct task id
         verify(mNavigatior).openTaskDetails(eq(ACTIVE_TASK.getId()));
@@ -313,11 +317,15 @@ public class TasksViewModelTest {
         withTaskInRepositoryAndSubscribed(ACTIVE_TASK);
         withTaskCompleted(ACTIVE_TASK);
         // And list of task items is emitted
-        List<TaskItem> items = mTasksSubscriber.getOnNextEvents().get(0).getItemList();
+        List<TaskItem> items = mTasksSubscriber.values().get(0).getItemList();
         TaskItem taskItem = items.get(0);
 
         // When triggering the check
-        taskItem.getOnCheckAction().call(true);
+        try {
+            taskItem.getOnCheckAction().accept(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         // The task is marked as completed
         verify(mTasksRepository).completeTask(ACTIVE_TASK);
@@ -331,11 +339,15 @@ public class TasksViewModelTest {
         //Given that we are subscribed to the snackbar text
         mViewModel.getSnackbarMessage().subscribe(mSnackbarTextSubscriber);
         // And list of task items is emitted
-        List<TaskItem> items = mTasksSubscriber.getOnNextEvents().get(0).getItemList();
+        List<TaskItem> items = mTasksSubscriber.values().get(0).getItemList();
         TaskItem taskItem = items.get(0);
 
         // When triggering the check
-        taskItem.getOnCheckAction().call(true);
+        try {
+            taskItem.getOnCheckAction().accept(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         // The snackbar emits a message
         mSnackbarTextSubscriber.assertValue(R.string.task_marked_complete);
@@ -347,11 +359,15 @@ public class TasksViewModelTest {
         withTaskInRepositoryAndSubscribed(COMPLETED_TASK);
         withTaskActivated(COMPLETED_TASK);
         // And list of task items is emitted
-        List<TaskItem> items = mTasksSubscriber.getOnNextEvents().get(0).getItemList();
+        List<TaskItem> items = mTasksSubscriber.values().get(0).getItemList();
         TaskItem taskItem = items.get(0);
 
         // When triggering the check
-        taskItem.getOnCheckAction().call(false);
+        try {
+            taskItem.getOnCheckAction().accept(false);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         // The task is marked as active
         mTasksRepository.activateTask(COMPLETED_TASK);
@@ -366,11 +382,15 @@ public class TasksViewModelTest {
         //Given that we are subscribed to the snackbar text
         mViewModel.getSnackbarMessage().subscribe(mSnackbarTextSubscriber);
         // And list of task items is emitted
-        List<TaskItem> items = mTasksSubscriber.getOnNextEvents().get(0).getItemList();
+        List<TaskItem> items = mTasksSubscriber.values().get(0).getItemList();
         TaskItem taskItem = items.get(0);
 
         // When triggering the check
-        taskItem.getOnCheckAction().call(false);
+        try {
+            taskItem.getOnCheckAction().accept(false);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         // The snackbar emits a message
         mSnackbarTextSubscriber.assertValue(R.string.task_marked_active);
@@ -391,7 +411,7 @@ public class TasksViewModelTest {
         mViewModel.clearCompletedTasks().subscribe(mCompletableSubscriber);
 
         // The Observable completes
-        mCompletableSubscriber.assertCompleted();
+        mCompletableSubscriber.assertComplete();
         // The completed tasks are cleared in the repository
         verify(mTasksRepository).clearCompletedTasks();
     }

@@ -16,13 +16,14 @@
 
 package com.example.android.architecture.blueprints.todoapp.data;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Strings;
 
 import java.util.UUID;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 /**
  * Immutable model class for a Task.

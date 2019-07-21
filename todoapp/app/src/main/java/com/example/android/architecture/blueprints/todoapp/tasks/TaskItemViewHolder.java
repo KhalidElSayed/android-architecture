@@ -7,8 +7,9 @@ import android.widget.TextView;
 
 import com.example.android.architecture.blueprints.todoapp.R;
 
-import rx.functions.Action0;
-import rx.functions.Action1;
+import io.reactivex.functions.Action;
+import io.reactivex.functions.Consumer;
+
 
 /**
  * View holder for the task item.
@@ -21,9 +22,9 @@ final class TaskItemViewHolder implements View.OnClickListener, CheckBox.OnCheck
 
     private CheckBox mCheckBox;
 
-    private Action0 mOnItemClickAction;
+    private Action mOnItemClickAction;
 
-    private Action1<Boolean> mOnCheckAction;
+    private Consumer<Boolean> mOnCheckAction;
 
     public TaskItemViewHolder(View rowView) {
         mRow = rowView;
@@ -48,14 +49,23 @@ final class TaskItemViewHolder implements View.OnClickListener, CheckBox.OnCheck
     @Override
     public void onClick(View v) {
         if (mOnItemClickAction != null) {
-            mOnItemClickAction.call();
+            try {
+                mOnItemClickAction.run();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
         }
     }
 
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         if (mOnCheckAction != null) {
-            mOnCheckAction.call(isChecked);
+            try {
+                mOnCheckAction.accept(isChecked);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 }

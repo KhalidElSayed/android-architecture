@@ -2,10 +2,11 @@ package com.example.android.architecture.blueprints.todoapp.tasks;
 
 import android.app.Activity;
 import android.content.Context;
-import android.support.annotation.NonNull;
 
 import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.util.providers.BaseNavigator;
+
+import androidx.annotation.NonNull;
 
 /**
  * Enables inversion of control of the ViewModel and Navigator classes for tasks screen.

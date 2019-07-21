@@ -16,8 +16,6 @@
 
 package com.example.android.architecture.blueprints.todoapp.data;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.VisibleForTesting;
 
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 
@@ -27,6 +25,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.VisibleForTesting;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;

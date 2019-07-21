@@ -18,12 +18,6 @@ package com.example.android.architecture.blueprints.todoapp.taskdetail;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -35,11 +29,17 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 
 import com.example.android.architecture.blueprints.todoapp.R;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.common.base.Preconditions;
 
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
-import rx.subscriptions.CompositeSubscription;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
+import androidx.fragment.app.Fragment;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * Main UI for the task detail screen.
@@ -63,7 +63,7 @@ public class TaskDetailFragment extends Fragment {
     private TaskDetailViewModel mViewModel;
 
     @Nullable
-    private CompositeSubscription mSubscription;
+    private CompositeDisposable mSubscription;
 
     public static TaskDetailFragment newInstance(@Nullable String taskId) {
         Bundle arguments = new Bundle();
@@ -113,7 +113,7 @@ public class TaskDetailFragment extends Fragment {
     private void bindViewModel() {
         // using a CompositeSubscription to gather all the subscriptions, so all of them can be
         // later unsubscribed together
-        mSubscription = new CompositeSubscription();
+        mSubscription = new CompositeDisposable();
 
         // subscribe to the emissions of the Ui Model
         // every time a new Ui Model, update the View
@@ -152,7 +152,7 @@ public class TaskDetailFragment extends Fragment {
 
     private void unbindViewModel() {
         // unsubscribing from all the subscriptions to ensure we don't have any memory leaks
-        getSubscription().unsubscribe();
+        getSubscription().dispose();
     }
 
     @Override
@@ -253,7 +253,7 @@ public class TaskDetailFragment extends Fragment {
     }
 
     @NonNull
-    private CompositeSubscription getSubscription() {
+    private CompositeDisposable getSubscription() {
         return Preconditions.checkNotNull(mSubscription);
     }
 

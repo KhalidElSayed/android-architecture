@@ -1,9 +1,10 @@
 package com.example.android.architecture.blueprints.todoapp.addedittask;
 
 import android.app.Activity;
-import android.support.annotation.NonNull;
 
 import com.example.android.architecture.blueprints.todoapp.util.providers.BaseNavigator;
+
+import androidx.annotation.NonNull;
 
 /**
  * Defines the navigation actions that can be called from AddEditTask screen

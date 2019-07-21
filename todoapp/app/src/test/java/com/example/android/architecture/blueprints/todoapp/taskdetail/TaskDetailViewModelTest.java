@@ -11,9 +11,9 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import rx.Completable;
-import rx.Observable;
-import rx.observers.TestSubscriber;
+import io.reactivex.Completable;
+import io.reactivex.Observable;
+import io.reactivex.observers.TestObserver;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -37,11 +37,11 @@ public class TaskDetailViewModelTest {
     @Mock
     private TaskDetailNavigator mNavigator;
 
-    private TestSubscriber<Void> mTestSubscriber;
+    private TestObserver<Void> mTestSubscriber;
 
-    private TestSubscriber<TaskUiModel> mTaskTestSubscriber;
+    private TestObserver<TaskUiModel> mTaskTestSubscriber;
 
-    private TestSubscriber<Integer> mSnackbarTestSubscriber;
+    private TestObserver<Integer> mSnackbarTestSubscriber;
 
     private TaskDetailViewModel mViewModel;
 
@@ -51,9 +51,9 @@ public class TaskDetailViewModelTest {
         // inject the mocks in the test the initMocks method needs to be called.
         MockitoAnnotations.initMocks(this);
 
-        mTestSubscriber = new TestSubscriber<>();
-        mTaskTestSubscriber = new TestSubscriber<>();
-        mSnackbarTestSubscriber = new TestSubscriber<>();
+        mTestSubscriber = new TestObserver<>();
+        mTaskTestSubscriber = new TestObserver<>();
+        mSnackbarTestSubscriber = new TestObserver<>();
     }
 
     @Test
@@ -62,7 +62,7 @@ public class TaskDetailViewModelTest {
         mViewModel = new TaskDetailViewModel(null, mTasksRepository, mNavigator);
 
         //When subscribing to the loading indicator
-        TestSubscriber<Boolean> testSubscriber = new TestSubscriber<>();
+        TestObserver<Boolean> testSubscriber = new TestObserver<>();
         mViewModel.getLoadingIndicatorVisibility().subscribe(testSubscriber);
 
         // Emits false, since the loading is not in progress
@@ -94,7 +94,7 @@ public class TaskDetailViewModelTest {
         mViewModel.getTaskUiModel().subscribe(mTaskTestSubscriber);
 
         // The correct task is emitted
-        TaskUiModel taskUiModel = mTaskTestSubscriber.getOnNextEvents().get(0);
+        TaskUiModel taskUiModel = mTaskTestSubscriber.values().get(0);
         assertTaskWithTitleAndDescription(taskUiModel);
     }
 
@@ -111,7 +111,7 @@ public class TaskDetailViewModelTest {
         mViewModel.getTaskUiModel().subscribe(mTaskTestSubscriber);
 
         // The correct task is emitted
-        TaskUiModel taskUiModel = mTaskTestSubscriber.getOnNextEvents().get(0);
+        TaskUiModel taskUiModel = mTaskTestSubscriber.values().get(0);
         assertTaskWithTitleAndCompleted(taskUiModel);
     }
 
@@ -123,7 +123,7 @@ public class TaskDetailViewModelTest {
         mViewModel = new TaskDetailViewModel(TASK_WITH_TITLE_DESCRIPTION.getId(), mTasksRepository, mNavigator);
 
         //When subscribing to the loading indicator updates
-        TestSubscriber<Boolean> testSubscriber = new TestSubscriber<>();
+        TestObserver<Boolean> testSubscriber = new TestObserver<>();
         mViewModel.getLoadingIndicatorVisibility().subscribe(testSubscriber);
         // When subscribing to the task
         mViewModel.getTaskUiModel().subscribe();
@@ -139,7 +139,7 @@ public class TaskDetailViewModelTest {
         mViewModel = new TaskDetailViewModel(null, mTasksRepository, mNavigator);
 
         // When subscribing to the editing of the task
-        TestSubscriber<String> testSubscriber = new TestSubscriber<>();
+        TestObserver<String> testSubscriber = new TestObserver<>();
         mViewModel.editTask().subscribe(testSubscriber);
 
         // An error is emitted
@@ -155,7 +155,7 @@ public class TaskDetailViewModelTest {
         mViewModel.editTask().subscribe(mTestSubscriber);
 
         // The Completable completes
-        mTestSubscriber.assertCompleted();
+        mTestSubscriber.assertComplete();
     }
 
     @Test
@@ -217,7 +217,7 @@ public class TaskDetailViewModelTest {
         // The task is deleted in the repository
         verify(mTasksRepository).deleteTask(eq(TASK_WITH_TITLE_DESCRIPTION.getId()));
         // The stream completes
-        mTestSubscriber.assertCompleted();
+        mTestSubscriber.assertComplete();
     }
 
 
@@ -257,7 +257,7 @@ public class TaskDetailViewModelTest {
         // The task is completed in the repository
         verify(mTasksRepository).completeTask(eq(TASK_WITH_TITLE_DESCRIPTION.getId()));
         // The stream completes
-        mTestSubscriber.assertCompleted();
+        mTestSubscriber.assertComplete();
     }
 
     @Test
@@ -272,7 +272,7 @@ public class TaskDetailViewModelTest {
         // The task is activated in the repository
         verify(mTasksRepository).activateTask(eq(TASK_WITH_TITLE_DESCRIPTION.getId()));
         // The stream completes
-        mTestSubscriber.assertCompleted();
+        mTestSubscriber.assertComplete();
     }
 
     @Test
