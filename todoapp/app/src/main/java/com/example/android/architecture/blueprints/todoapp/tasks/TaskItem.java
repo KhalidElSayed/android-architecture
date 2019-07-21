@@ -1,7 +1,7 @@
 package com.example.android.architecture.blueprints.todoapp.tasks;
 
 
-import com.example.android.architecture.blueprints.todoapp.data.Task;
+import com.example.android.architecture.blueprints.todoapp.data.model.Task;
 
 import androidx.annotation.DrawableRes;
 import io.reactivex.functions.Action;

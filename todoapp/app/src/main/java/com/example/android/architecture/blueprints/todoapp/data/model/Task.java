@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.android.architecture.blueprints.todoapp.data;
+package com.example.android.architecture.blueprints.todoapp.data.model;
 
 
 import com.google.common.base.Objects;
@@ -24,21 +24,31 @@ import java.util.UUID;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
 
 /**
  * Immutable model class for a Task.
  */
+@Entity(tableName = "tasks")
 public final class Task {
 
     @NonNull
+    @PrimaryKey
+    @ColumnInfo(name = "taskid")
     private final String mId;
 
     @Nullable
+    @ColumnInfo(name = "title")
     private final String mTitle;
 
     @Nullable
+    @ColumnInfo(name = "description")
     private final String mDescription;
 
+    @ColumnInfo(name = "completed")
     private final boolean mCompleted;
 
     /**
@@ -47,6 +57,7 @@ public final class Task {
      * @param title       title of the task
      * @param description description of the task
      */
+    @Ignore
     public Task(@Nullable String title, @Nullable String description) {
         this(title, description, UUID.randomUUID().toString(), false);
     }
@@ -59,6 +70,7 @@ public final class Task {
      * @param description description of the task
      * @param id          id of the task
      */
+    @Ignore
     public Task(@Nullable String title, @Nullable String description, @NonNull String id) {
         this(title, description, id, false);
     }
@@ -70,6 +82,7 @@ public final class Task {
      * @param description description of the task
      * @param completed   true if the task is completed, false if it's active
      */
+    @Ignore
     public Task(@Nullable String title, @Nullable String description, boolean completed) {
         this(title, description, UUID.randomUUID().toString(), completed);
     }

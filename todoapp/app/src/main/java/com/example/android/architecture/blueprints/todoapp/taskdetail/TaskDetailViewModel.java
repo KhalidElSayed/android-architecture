@@ -19,7 +19,7 @@ package com.example.android.architecture.blueprints.todoapp.taskdetail;
 import android.app.Activity;
 
 import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.data.Task;
+import com.example.android.architecture.blueprints.todoapp.data.model.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.google.common.base.Strings;
 

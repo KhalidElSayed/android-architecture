@@ -17,6 +17,7 @@
 package com.example.android.architecture.blueprints.todoapp.data;
 
 
+import com.example.android.architecture.blueprints.todoapp.data.model.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 
 import java.util.ArrayList;

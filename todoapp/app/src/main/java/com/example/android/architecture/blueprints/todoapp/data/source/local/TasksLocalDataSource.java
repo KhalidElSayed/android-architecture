@@ -19,24 +19,22 @@ package com.example.android.architecture.blueprints.todoapp.data.source.local;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.text.TextUtils;
 
-import com.example.android.architecture.blueprints.todoapp.data.Task;
+import com.example.android.architecture.blueprints.todoapp.data.model.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksPersistenceContract.TaskEntry;
+import com.example.android.architecture.blueprints.todoapp.data.source.local.dao.TaskDao;
 import com.example.android.architecture.blueprints.todoapp.util.schedulers.BaseSchedulerProvider;
 import com.squareup.sqlbrite2.BriteDatabase;
-import com.squareup.sqlbrite2.SqlBrite;
 
 import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.room.Room;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
-import io.reactivex.functions.Function;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -50,10 +48,11 @@ public class TasksLocalDataSource implements TasksDataSource {
     private static TasksLocalDataSource INSTANCE;
 
     @NonNull
-    private final BriteDatabase mDatabaseHelper;
+//    private final BriteDatabase mDatabaseHelper;
+    private final TaskDao mTaskDao;
 
-    @NonNull
-    private Function<Cursor, Task> mTaskMapperFunction;
+//    @NonNull
+//    private Function<Cursor, Task> mTaskMapperFunction;
 
     // Prevent direct instantiation.
     private TasksLocalDataSource(@NonNull Context context,
@@ -61,9 +60,12 @@ public class TasksLocalDataSource implements TasksDataSource {
         checkNotNull(context, "context cannot be null");
         checkNotNull(schedulerProvider, "scheduleProvider cannot be null");
         TasksDbHelper dbHelper = new TasksDbHelper(context);
-        SqlBrite sqlBrite = new SqlBrite.Builder().build();
-        mDatabaseHelper = sqlBrite.wrapDatabaseHelper(dbHelper, schedulerProvider.io());
-        mTaskMapperFunction = this::getTask;
+//        SqlBrite sqlBrite = new SqlBrite.Builder().build();
+//        mDatabaseHelper = sqlBrite.wrapDatabaseHelper(dbHelper, schedulerProvider.io());
+//        mTaskMapperFunction = this::getTask;
+        mTaskDao = Room.databaseBuilder(context, TaskDatabase.class, "Tasks.db")
+                .build()
+                .taskDao();
     }
 
     public static TasksLocalDataSource getInstance(
@@ -81,6 +83,7 @@ public class TasksLocalDataSource implements TasksDataSource {
 
     @NonNull
     private Task getTask(@NonNull Cursor c) {
+//        return mTaskDao.getTask();
         String itemId = c.getString(c.getColumnIndexOrThrow(TaskEntry.COLUMN_NAME_ENTRY_ID));
         String title = c.getString(c.getColumnIndexOrThrow(TaskEntry.COLUMN_NAME_TITLE));
         String description =
@@ -96,7 +99,7 @@ public class TasksLocalDataSource implements TasksDataSource {
      */
     @Override
     public Single<List<Task>> getTasks() {
-        String[] projection = {
+        /*String[] projection = {
                 TaskEntry.COLUMN_NAME_ENTRY_ID,
                 TaskEntry.COLUMN_NAME_TITLE,
                 TaskEntry.COLUMN_NAME_DESCRIPTION,
@@ -105,12 +108,13 @@ public class TasksLocalDataSource implements TasksDataSource {
         String sql = String.format("SELECT %s FROM %s", TextUtils.join(",", projection), TaskEntry.TABLE_NAME);
         return mDatabaseHelper.createQuery(TaskEntry.TABLE_NAME, sql)
                 .mapToList(mTaskMapperFunction)
-                .firstOrError();
+                .firstOrError();*/
+        return mTaskDao.getTasks();
     }
 
     @Override
     public Observable<Task> getTask(@NonNull String taskId) {
-        String[] projection = {
+        /*String[] projection = {
                 TaskEntry.COLUMN_NAME_ENTRY_ID,
                 TaskEntry.COLUMN_NAME_TITLE,
                 TaskEntry.COLUMN_NAME_DESCRIPTION,
@@ -119,26 +123,30 @@ public class TasksLocalDataSource implements TasksDataSource {
         String sql = String.format("SELECT %s FROM %s WHERE %s LIKE ?",
                 TextUtils.join(",", projection), TaskEntry.TABLE_NAME, TaskEntry.COLUMN_NAME_ENTRY_ID);
         return mDatabaseHelper.createQuery(TaskEntry.TABLE_NAME, sql, taskId)
-                .mapToOneOrDefault(mTaskMapperFunction, null);
+                .mapToOneOrDefault(mTaskMapperFunction, null);*/
+        return mTaskDao.getTask(taskId).toObservable();
     }
 
     @Override
     public Completable saveTask(@NonNull Task task) {
         checkNotNull(task);
-        return Completable.fromAction(() -> {
+
+        /*return Completable.fromAction(() -> {
             ContentValues values = toContentValues(task);
             mDatabaseHelper.insert(TaskEntry.TABLE_NAME, values, SQLiteDatabase.CONFLICT_REPLACE);
-        });
+        });*/
+        return mTaskDao.insertTask(task);
     }
 
     @Override
     public Completable saveTasks(@NonNull List<Task> tasks) {
         checkNotNull(tasks);
 
-        return Observable.using(mDatabaseHelper::newTransaction,
+        return mTaskDao.insertTasks(tasks);
+        /*return Observable.using(mDatabaseHelper::newTransaction,
                 transaction -> inTransactionInsert(tasks, transaction),
                 BriteDatabase.Transaction::end)
-                .ignoreElements();
+                .ignoreElements();*/
     }
 
     @NonNull
@@ -150,7 +158,7 @@ public class TasksLocalDataSource implements TasksDataSource {
         return Observable.fromIterable(tasks)
                 .doOnNext(task -> {
                     ContentValues values = toContentValues(task);
-                    mDatabaseHelper.insert(TaskEntry.TABLE_NAME, values);
+//                    mDatabaseHelper.insert(TaskEntry.TABLE_NAME, values);
                 })
                 .doOnComplete(transaction::markSuccessful)
                 .toList()
@@ -180,7 +188,7 @@ public class TasksLocalDataSource implements TasksDataSource {
 
             String selection = TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
             String[] selectionArgs = {taskId};
-            mDatabaseHelper.update(TaskEntry.TABLE_NAME, values, selection, selectionArgs);
+//            mDatabaseHelper.update(TaskEntry.TABLE_NAME, values, selection, selectionArgs);
         });
     }
 
@@ -197,7 +205,7 @@ public class TasksLocalDataSource implements TasksDataSource {
 
             String selection = TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
             String[] selectionArgs = {taskId};
-            mDatabaseHelper.update(TaskEntry.TABLE_NAME, values, selection, selectionArgs);
+//            mDatabaseHelper.update(TaskEntry.TABLE_NAME, values, selection, selectionArgs);
         });
     }
 
@@ -205,7 +213,7 @@ public class TasksLocalDataSource implements TasksDataSource {
     public void clearCompletedTasks() {
         String selection = TaskEntry.COLUMN_NAME_COMPLETED + " LIKE ?";
         String[] selectionArgs = {"1"};
-        mDatabaseHelper.delete(TaskEntry.TABLE_NAME, selection, selectionArgs);
+//        mDatabaseHelper.delete(TaskEntry.TABLE_NAME, selection, selectionArgs);
     }
 
     @Override
@@ -217,13 +225,14 @@ public class TasksLocalDataSource implements TasksDataSource {
 
     @Override
     public void deleteAllTasks() {
-        mDatabaseHelper.delete(TaskEntry.TABLE_NAME, null);
+        mTaskDao.deleteAllTasks();
+//        mDatabaseHelper.delete(TaskEntry.TABLE_NAME, null);
     }
 
     @Override
     public void deleteTask(@NonNull String taskId) {
         String selection = TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
         String[] selectionArgs = {taskId};
-        mDatabaseHelper.delete(TaskEntry.TABLE_NAME, selection, selectionArgs);
+//        mDatabaseHelper.delete(TaskEntry.TABLE_NAME, selection, selectionArgs);
     }
 }

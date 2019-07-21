@@ -18,14 +18,13 @@ package com.example.android.architecture.blueprints.todoapp.statistics;
 
 
 import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.data.Task;
+import com.example.android.architecture.blueprints.todoapp.data.model.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
 import com.example.android.architecture.blueprints.todoapp.util.providers.BaseResourceProvider;
 
 import androidx.annotation.NonNull;
 import io.reactivex.Observable;
-import io.reactivex.Single;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

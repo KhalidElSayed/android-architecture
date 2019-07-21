@@ -17,7 +17,7 @@
 package com.example.android.architecture.blueprints.todoapp.data.source;
 
 
-import com.example.android.architecture.blueprints.todoapp.data.Task;
+import com.example.android.architecture.blueprints.todoapp.data.model.Task;
 import com.example.android.architecture.blueprints.todoapp.util.schedulers.BaseSchedulerProvider;
 
 import java.util.List;
