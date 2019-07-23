@@ -1,7 +1,5 @@
 package com.example.android.architecture.blueprints.todoapp.statistics;
 
-import android.support.annotation.StringRes;
-
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.data.model.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
@@ -16,8 +14,9 @@ import org.mockito.MockitoAnnotations;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.annotation.StringRes;
 import io.reactivex.Completable;
-import io.reactivex.Observable;
+import io.reactivex.Single;
 import io.reactivex.observers.TestObserver;
 
 import static org.junit.Assert.assertEquals;
@@ -67,7 +66,7 @@ public class StatisticsViewModelTest {
     public void getStatistics_emitsLoadingInitially() {
         //Given a list of tasks in the repository
         when(mTasksRepository.refreshTasks()).thenReturn(Completable.complete());
-        when(mTasksRepository.getTasks()).thenReturn(Observable.never());
+        when(mTasksRepository.getTasks()).thenReturn(Single.never());
 
         withText(R.string.loading, LOADING);
 
@@ -83,7 +82,7 @@ public class StatisticsViewModelTest {
     public void getStatistics_withTasks_returnsCorrectData() {
         //Given a list of tasks in the repository
         when(mTasksRepository.refreshTasks()).thenReturn(Completable.complete());
-        when(mTasksRepository.getTasks()).thenReturn(Observable.just(mTasks));
+        when(mTasksRepository.getTasks()).thenReturn(Single.just(mTasks));
 
         //When subscribing to the statistics stream
         mViewModel.getUiModel().subscribe();
@@ -96,7 +95,7 @@ public class StatisticsViewModelTest {
     public void getStatistics_withNoTasks_returnsCorrectData() {
         //Given a list of tasks in the repository
         when(mTasksRepository.refreshTasks()).thenReturn(Completable.complete());
-        when(mTasksRepository.getTasks()).thenReturn(Observable.just(new ArrayList<>()));
+        when(mTasksRepository.getTasks()).thenReturn(Single.just(new ArrayList<>()));
         // And string resources
         withText(R.string.statistics_no_tasks, NO_TASKS);
 
@@ -112,7 +111,7 @@ public class StatisticsViewModelTest {
     public void getStatistics_emitsCorrectUiModel_afterStatisticsAreRetrieved_WithError() {
         //Given a list of tasks in the repository
         when(mTasksRepository.refreshTasks()).thenReturn(Completable.complete());
-        when(mTasksRepository.getTasks()).thenReturn(Observable.error(new Exception()));
+        when(mTasksRepository.getTasks()).thenReturn(Single.error(new Exception()));
         // And a string to be returned for loading error
         withText(R.string.loading_tasks_error, LOADING_ERROR);
 
