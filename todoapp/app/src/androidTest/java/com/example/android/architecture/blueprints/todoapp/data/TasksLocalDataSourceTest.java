@@ -18,7 +18,7 @@ package com.example.android.architecture.blueprints.todoapp.data;
 
 import com.example.android.architecture.blueprints.todoapp.data.model.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
-import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksDbHelper;
+import com.example.android.architecture.blueprints.todoapp.data.source.local.TaskDatabase;
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksLocalDataSource;
 import com.example.android.architecture.blueprints.todoapp.util.schedulers.BaseSchedulerProvider;
 import com.example.android.architecture.blueprints.todoapp.util.schedulers.ImmediateSchedulerProvider;
@@ -44,7 +44,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Integration test for the {@link TasksDataSource}, which uses the {@link TasksDbHelper}.
+ * Integration test for the {@link TasksDataSource}, which uses the {@link TaskDatabase}.
  */
 @RunWith(AndroidJUnit4.class)
 @LargeTest
@@ -183,10 +183,10 @@ public class TasksLocalDataSourceTest {
         //Given that no task has been saved
         //When querying for a task, null is returned.
         TestObserver<Task> testObserver = new TestObserver<>();
-        mLocalDataSource.getTask("1").subscribe(testObserver);
+        mLocalDataSource.getTask(1).subscribe(testObserver);
 
         // TODO: the RxJava 2 change the mechanism of the item flow so we can't just emit an null values.
-        testObserver.assertValue(null);
+        testObserver.assertEmpty();
     }
 
     @Test

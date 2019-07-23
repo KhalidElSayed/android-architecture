@@ -40,7 +40,7 @@ public class TasksRemoteDataSource implements TasksDataSource {
 
     private static final int SERVICE_LATENCY_IN_MILLIS = 5000;
 
-    private final static Map<String, Task> TASKS_SERVICE_DATA;
+    private final static Map<Integer, Task> TASKS_SERVICE_DATA;
 
     static {
         TASKS_SERVICE_DATA = new LinkedHashMap<>(2);
@@ -72,7 +72,7 @@ public class TasksRemoteDataSource implements TasksDataSource {
     }
 
     @Override
-    public Observable<Task> getTask(@NonNull String taskId) {
+    public Observable<Task> getTask(@NonNull Integer taskId) {
         final Task task = TASKS_SERVICE_DATA.get(taskId);
         if (task != null) {
             return Observable.just(task).delay(SERVICE_LATENCY_IN_MILLIS, TimeUnit.MILLISECONDS);
@@ -102,7 +102,7 @@ public class TasksRemoteDataSource implements TasksDataSource {
     }
 
     @Override
-    public Completable completeTask(@NonNull String taskId) {
+    public Completable completeTask(@NonNull Integer taskId) {
         return Completable.fromAction(() -> {
             Task task = TASKS_SERVICE_DATA.get(taskId);
             task = new Task(task.getTitle(), task.getDescription(), taskId, true);
@@ -119,7 +119,7 @@ public class TasksRemoteDataSource implements TasksDataSource {
     }
 
     @Override
-    public Completable activateTask(@NonNull String taskId) {
+    public Completable activateTask(@NonNull Integer taskId) {
         return Completable.fromAction(() -> {
             Task task = TASKS_SERVICE_DATA.get(taskId);
             task = new Task(task.getTitle(), task.getDescription(), taskId, false);
@@ -129,9 +129,9 @@ public class TasksRemoteDataSource implements TasksDataSource {
 
     @Override
     public void clearCompletedTasks() {
-        Iterator<Map.Entry<String, Task>> it = TASKS_SERVICE_DATA.entrySet().iterator();
+        Iterator<Map.Entry<Integer, Task>> it = TASKS_SERVICE_DATA.entrySet().iterator();
         while (it.hasNext()) {
-            Map.Entry<String, Task> entry = it.next();
+            Map.Entry<Integer, Task> entry = it.next();
             if (entry.getValue().isCompleted()) {
                 it.remove();
             }
@@ -151,7 +151,7 @@ public class TasksRemoteDataSource implements TasksDataSource {
     }
 
     @Override
-    public void deleteTask(@NonNull String taskId) {
+    public void deleteTask(@NonNull Integer taskId) {
         TASKS_SERVICE_DATA.remove(taskId);
     }
 }

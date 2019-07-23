@@ -16,16 +16,12 @@
 
 package com.example.android.architecture.blueprints.todoapp.data.source.local;
 
-import android.content.ContentValues;
 import android.content.Context;
-import android.database.Cursor;
 
 import com.example.android.architecture.blueprints.todoapp.data.model.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
-import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksPersistenceContract.TaskEntry;
 import com.example.android.architecture.blueprints.todoapp.data.source.local.dao.TaskDao;
 import com.example.android.architecture.blueprints.todoapp.util.schedulers.BaseSchedulerProvider;
-import com.squareup.sqlbrite2.BriteDatabase;
 
 import java.util.List;
 
@@ -48,22 +44,16 @@ public class TasksLocalDataSource implements TasksDataSource {
     private static TasksLocalDataSource INSTANCE;
 
     @NonNull
-//    private final BriteDatabase mDatabaseHelper;
     private final TaskDao mTaskDao;
-
-//    @NonNull
-//    private Function<Cursor, Task> mTaskMapperFunction;
 
     // Prevent direct instantiation.
     private TasksLocalDataSource(@NonNull Context context,
                                  @NonNull BaseSchedulerProvider schedulerProvider) {
         checkNotNull(context, "context cannot be null");
         checkNotNull(schedulerProvider, "scheduleProvider cannot be null");
-        TasksDbHelper dbHelper = new TasksDbHelper(context);
-//        SqlBrite sqlBrite = new SqlBrite.Builder().build();
-//        mDatabaseHelper = sqlBrite.wrapDatabaseHelper(dbHelper, schedulerProvider.io());
-//        mTaskMapperFunction = this::getTask;
         mTaskDao = Room.databaseBuilder(context, TaskDatabase.class, "Tasks.db")
+                .fallbackToDestructiveMigration()
+//                .addMigrations(TaskDatabase.MIGRATION_1_2)
                 .build()
                 .taskDao();
     }
@@ -81,97 +71,30 @@ public class TasksLocalDataSource implements TasksDataSource {
         INSTANCE = null;
     }
 
-    @NonNull
-    private Task getTask(@NonNull Cursor c) {
-//        return mTaskDao.getTask();
-        String itemId = c.getString(c.getColumnIndexOrThrow(TaskEntry.COLUMN_NAME_ENTRY_ID));
-        String title = c.getString(c.getColumnIndexOrThrow(TaskEntry.COLUMN_NAME_TITLE));
-        String description =
-                c.getString(c.getColumnIndexOrThrow(TaskEntry.COLUMN_NAME_DESCRIPTION));
-        boolean completed =
-                c.getInt(c.getColumnIndexOrThrow(TaskEntry.COLUMN_NAME_COMPLETED)) == 1;
-        return new Task(title, description, itemId, completed);
-    }
-
     /**
      * @return an Observable that emits the list of tasks in the database, every time the Tasks
      * table is modified
      */
     @Override
     public Single<List<Task>> getTasks() {
-        /*String[] projection = {
-                TaskEntry.COLUMN_NAME_ENTRY_ID,
-                TaskEntry.COLUMN_NAME_TITLE,
-                TaskEntry.COLUMN_NAME_DESCRIPTION,
-                TaskEntry.COLUMN_NAME_COMPLETED
-        };
-        String sql = String.format("SELECT %s FROM %s", TextUtils.join(",", projection), TaskEntry.TABLE_NAME);
-        return mDatabaseHelper.createQuery(TaskEntry.TABLE_NAME, sql)
-                .mapToList(mTaskMapperFunction)
-                .firstOrError();*/
-        return mTaskDao.getTasks();
+        return mTaskDao.getTasks().firstOrError();
     }
 
     @Override
-    public Observable<Task> getTask(@NonNull String taskId) {
-        /*String[] projection = {
-                TaskEntry.COLUMN_NAME_ENTRY_ID,
-                TaskEntry.COLUMN_NAME_TITLE,
-                TaskEntry.COLUMN_NAME_DESCRIPTION,
-                TaskEntry.COLUMN_NAME_COMPLETED
-        };
-        String sql = String.format("SELECT %s FROM %s WHERE %s LIKE ?",
-                TextUtils.join(",", projection), TaskEntry.TABLE_NAME, TaskEntry.COLUMN_NAME_ENTRY_ID);
-        return mDatabaseHelper.createQuery(TaskEntry.TABLE_NAME, sql, taskId)
-                .mapToOneOrDefault(mTaskMapperFunction, null);*/
+    public Observable<Task> getTask(@NonNull Integer taskId) {
         return mTaskDao.getTask(taskId).toObservable();
     }
 
     @Override
     public Completable saveTask(@NonNull Task task) {
         checkNotNull(task);
-
-        /*return Completable.fromAction(() -> {
-            ContentValues values = toContentValues(task);
-            mDatabaseHelper.insert(TaskEntry.TABLE_NAME, values, SQLiteDatabase.CONFLICT_REPLACE);
-        });*/
         return mTaskDao.insertTask(task);
     }
 
     @Override
     public Completable saveTasks(@NonNull List<Task> tasks) {
         checkNotNull(tasks);
-
         return mTaskDao.insertTasks(tasks);
-        /*return Observable.using(mDatabaseHelper::newTransaction,
-                transaction -> inTransactionInsert(tasks, transaction),
-                BriteDatabase.Transaction::end)
-                .ignoreElements();*/
-    }
-
-    @NonNull
-    private Observable<List<Task>> inTransactionInsert(@NonNull List<Task> tasks,
-                                                       @NonNull BriteDatabase.Transaction transaction) {
-        checkNotNull(tasks);
-        checkNotNull(transaction);
-
-        return Observable.fromIterable(tasks)
-                .doOnNext(task -> {
-                    ContentValues values = toContentValues(task);
-//                    mDatabaseHelper.insert(TaskEntry.TABLE_NAME, values);
-                })
-                .doOnComplete(transaction::markSuccessful)
-                .toList()
-                .toObservable();
-    }
-
-    private ContentValues toContentValues(Task task) {
-        ContentValues values = new ContentValues();
-        values.put(TaskEntry.COLUMN_NAME_ENTRY_ID, task.getId());
-        values.put(TaskEntry.COLUMN_NAME_TITLE, task.getTitle());
-        values.put(TaskEntry.COLUMN_NAME_DESCRIPTION, task.getDescription());
-        values.put(TaskEntry.COLUMN_NAME_COMPLETED, task.isCompleted());
-        return values;
     }
 
     @Override
@@ -181,15 +104,16 @@ public class TasksLocalDataSource implements TasksDataSource {
     }
 
     @Override
-    public Completable completeTask(@NonNull String taskId) {
-        return Completable.fromAction(() -> {
+    public Completable completeTask(@NonNull Integer taskId) {
+        /*return Completable.fromAction(() -> {
             ContentValues values = new ContentValues();
             values.put(TaskEntry.COLUMN_NAME_COMPLETED, true);
 
             String selection = TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
             String[] selectionArgs = {taskId};
 //            mDatabaseHelper.update(TaskEntry.TABLE_NAME, values, selection, selectionArgs);
-        });
+        });*/
+        return mTaskDao.updateTask(1, taskId);
     }
 
     @Override
@@ -198,22 +122,24 @@ public class TasksLocalDataSource implements TasksDataSource {
     }
 
     @Override
-    public Completable activateTask(@NonNull String taskId) {
-        return Completable.fromAction(() -> {
+    public Completable activateTask(@NonNull Integer taskId) {
+        /*return Completable.fromAction(() -> {
             ContentValues values = new ContentValues();
             values.put(TaskEntry.COLUMN_NAME_COMPLETED, false);
 
             String selection = TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
             String[] selectionArgs = {taskId};
 //            mDatabaseHelper.update(TaskEntry.TABLE_NAME, values, selection, selectionArgs);
-        });
+        });*/
+        return mTaskDao.updateTask(0, taskId);
     }
 
     @Override
     public void clearCompletedTasks() {
-        String selection = TaskEntry.COLUMN_NAME_COMPLETED + " LIKE ?";
+        /*String selection = TaskEntry.COLUMN_NAME_COMPLETED + " LIKE ?";
         String[] selectionArgs = {"1"};
-//        mDatabaseHelper.delete(TaskEntry.TABLE_NAME, selection, selectionArgs);
+        mDatabaseHelper.delete(TaskEntry.TABLE_NAME, selection, selectionArgs);*/
+        mTaskDao.deleteTask(1);
     }
 
     @Override
@@ -224,15 +150,16 @@ public class TasksLocalDataSource implements TasksDataSource {
     }
 
     @Override
-    public void deleteAllTasks() {
-        mTaskDao.deleteAllTasks();
-//        mDatabaseHelper.delete(TaskEntry.TABLE_NAME, null);
+    public void deleteTask(@NonNull Integer taskId) {
+        /*String selection = TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
+        String[] selectionArgs = {taskId};
+        mDatabaseHelper.delete(TaskEntry.TABLE_NAME, selection, selectionArgs);*/
+        mTaskDao.deleteTask(taskId);
     }
 
     @Override
-    public void deleteTask(@NonNull String taskId) {
-        String selection = TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
-        String[] selectionArgs = {taskId};
-//        mDatabaseHelper.delete(TaskEntry.TABLE_NAME, selection, selectionArgs);
+    public void deleteAllTasks() {
+        mTaskDao.deleteAllTasks();
+//        mDatabaseHelper.delete(TaskEntry.TABLE_NAME, null);
     }
 }

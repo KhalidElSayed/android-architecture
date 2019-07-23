@@ -46,7 +46,7 @@ public class TaskDetailNavigator {
      *
      * @param taskId the id of the task to be edited.
      */
-    void onStartEditTask(String taskId) {
+    void onStartEditTask(Integer taskId) {
         mNavigationProvider.startActivityForResultWithExtra(AddEditTaskActivity.class,
                 TaskDetailActivity.REQUEST_EDIT_TASK, AddEditTaskFragment.ARGUMENT_EDIT_TASK_ID,
                 taskId);

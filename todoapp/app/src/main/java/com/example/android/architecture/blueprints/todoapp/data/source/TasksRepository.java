@@ -86,7 +86,7 @@ public class TasksRepository implements TasksDataSource {
     }
 
     /**
-     * Gets tasks from  local data source (SQLite).
+     * Gets tasks from  local data source (Room Db).
      */
     @Override
     public Single<List<Task>> getTasks() {
@@ -128,7 +128,7 @@ public class TasksRepository implements TasksDataSource {
     }
 
     @Override
-    public Completable completeTask(@NonNull String taskId) {
+    public Completable completeTask(@NonNull Integer taskId) {
         checkNotNull(taskId);
         return mTasksLocalDataSource.completeTask(taskId)
                 .andThen(mTasksRemoteDataSource.completeTask(taskId));
@@ -142,7 +142,7 @@ public class TasksRepository implements TasksDataSource {
     }
 
     @Override
-    public Completable activateTask(@NonNull String taskId) {
+    public Completable activateTask(@NonNull Integer taskId) {
         checkNotNull(taskId);
         return mTasksLocalDataSource.activateTask(taskId)
                 .andThen(mTasksRemoteDataSource.activateTask(taskId));
@@ -155,10 +155,10 @@ public class TasksRepository implements TasksDataSource {
     }
 
     /**
-     * Gets task from local data source (sqlite).
+     * Gets task from local data source (room db).
      */
     @Override
-    public Observable<Task> getTask(@NonNull final String taskId) {
+    public Observable<Task> getTask(@NonNull final Integer taskId) {
         checkNotNull(taskId);
         return mTasksLocalDataSource.getTask(taskId);
     }
@@ -189,7 +189,7 @@ public class TasksRepository implements TasksDataSource {
      * @param taskId a task id
      */
     @Override
-    public void deleteTask(@NonNull String taskId) {
+    public void deleteTask(@NonNull Integer taskId) {
         mTasksRemoteDataSource.deleteTask(checkNotNull(taskId));
         mTasksLocalDataSource.deleteTask(checkNotNull(taskId));
     }

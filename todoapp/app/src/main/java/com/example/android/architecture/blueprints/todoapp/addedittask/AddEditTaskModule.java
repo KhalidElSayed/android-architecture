@@ -15,7 +15,7 @@ import androidx.annotation.Nullable;
 class AddEditTaskModule {
 
     @NonNull
-    public static AddEditTaskViewModel createAddEditTaskViewModel(@Nullable String taskId,
+    public static AddEditTaskViewModel createAddEditTaskViewModel(@Nullable Integer taskId,
                                                                   @NonNull Activity activity) {
         Context appContext = activity.getApplicationContext();
         BaseNavigator navigationProvider = Injection.createNavigationProvider(activity);

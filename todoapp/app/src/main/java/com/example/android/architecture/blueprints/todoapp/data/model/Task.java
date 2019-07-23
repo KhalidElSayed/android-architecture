@@ -30,26 +30,26 @@ import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 /**
- * Immutable model class for a Task.
+ * mutable model class for a Task.
  */
 @Entity(tableName = "tasks")
 public final class Task {
 
     @NonNull
-    @PrimaryKey
-    @ColumnInfo(name = "taskid")
-    private final String mId;
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "id")
+    private Integer mId;
 
     @Nullable
     @ColumnInfo(name = "title")
-    private final String mTitle;
+    private String mTitle;
 
     @Nullable
     @ColumnInfo(name = "description")
-    private final String mDescription;
+    private String mDescription;
 
     @ColumnInfo(name = "completed")
-    private final boolean mCompleted;
+    private boolean mCompleted;
 
     /**
      * Use this constructor to create a new active Task.
@@ -57,9 +57,8 @@ public final class Task {
      * @param title       title of the task
      * @param description description of the task
      */
-    @Ignore
     public Task(@Nullable String title, @Nullable String description) {
-        this(title, description, UUID.randomUUID().toString(), false);
+        this(title, description, null, false);
     }
 
     /**
@@ -71,7 +70,7 @@ public final class Task {
      * @param id          id of the task
      */
     @Ignore
-    public Task(@Nullable String title, @Nullable String description, @NonNull String id) {
+    public Task(@Nullable String title, @Nullable String description, @NonNull Integer id) {
         this(title, description, id, false);
     }
 
@@ -84,7 +83,7 @@ public final class Task {
      */
     @Ignore
     public Task(@Nullable String title, @Nullable String description, boolean completed) {
-        this(title, description, UUID.randomUUID().toString(), completed);
+        this(title, description, UUID.randomUUID().clockSequence(), completed);
     }
 
     /**
@@ -96,8 +95,9 @@ public final class Task {
      * @param id          id of the task
      * @param completed   true if the task is completed, false if it's active
      */
+    @Ignore
     public Task(@Nullable String title, @Nullable String description,
-                @NonNull String id, boolean completed) {
+                @NonNull Integer id, boolean completed) {
         mId = id;
         mTitle = title;
         mDescription = description;
@@ -105,13 +105,39 @@ public final class Task {
     }
 
     @NonNull
-    public String getId() {
+    public Integer getId() {
         return mId;
+    }
+    public void setId(@NonNull Integer id) {
+        this.mId = id;
     }
 
     @Nullable
     public String getTitle() {
         return mTitle;
+    }
+    public void setTitle(@Nullable String title) {
+        this.mTitle = title;
+    }
+
+    @Nullable
+    public String getDescription() {
+        return mDescription;
+    }
+    public void setDescription(@Nullable String description) {
+        this.mDescription = description;
+    }
+
+    public void setCompleted(boolean completed) {
+        this.mCompleted = completed;
+    }
+
+    public boolean isCompleted() {
+        return mCompleted;
+    }
+
+    public boolean isActive() {
+        return !mCompleted;
     }
 
     @Nullable
@@ -121,19 +147,6 @@ public final class Task {
         } else {
             return mDescription;
         }
-    }
-
-    @Nullable
-    public String getDescription() {
-        return mDescription;
-    }
-
-    public boolean isCompleted() {
-        return mCompleted;
-    }
-
-    public boolean isActive() {
-        return !mCompleted;
     }
 
     public boolean isEmpty() {

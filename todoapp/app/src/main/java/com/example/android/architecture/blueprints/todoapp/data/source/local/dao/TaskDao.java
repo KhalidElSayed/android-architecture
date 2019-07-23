@@ -25,6 +25,7 @@ import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import io.reactivex.Completable;
+import io.reactivex.Flowable;
 import io.reactivex.Single;
 
 /**
@@ -36,10 +37,11 @@ public interface TaskDao {
     /**
      * Get a task from the table.
      *
+     * @param taskId the task id to be selected
      * @return the task from the table
      */
-    @Query("SELECT * FROM tasks WHERE taskid LIKE :taskId")
-    Single<Task> getTask(String taskId);
+    @Query("SELECT * FROM tasks WHERE id = :taskId")
+    Flowable<Task> getTask(Integer taskId);
 
     /**
      * Gets all tasks from the table.
@@ -47,7 +49,7 @@ public interface TaskDao {
      * @return all tasks as list from the table
      */
     @Query("SELECT * FROM tasks")
-    Single<List<Task>> getTasks();
+    Flowable<List<Task>> getTasks();
 
     /**
      * Insert a task in the database. If the task already exists, replace it.
@@ -64,6 +66,26 @@ public interface TaskDao {
      */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     Completable insertTasks(List<Task> tasks);
+
+    /**
+     * Insert a list of tasks in the database. If a task already exists, replace it.
+     *
+     * @param taskId the task id that would be updated
+     */
+    @Query("Update tasks SET completed = :isCompleted WHERE id = :taskId")
+    Completable updateTask(int isCompleted, Integer taskId);
+
+    /**
+     * Delete the completed tasks.
+     */
+    @Query("DELETE FROM TASKS WHERE completed = :isCompleted")
+    void deleteTask(int isCompleted);
+
+    /**
+     * Delete a task.
+     */
+    @Query("DELETE FROM TASKS WHERE id LIKE :taskId")
+    void deleteTask(Integer taskId);
 
     /**
      * Delete all tasks.

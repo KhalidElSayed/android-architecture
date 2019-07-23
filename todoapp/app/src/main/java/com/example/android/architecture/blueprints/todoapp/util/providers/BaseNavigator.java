@@ -33,5 +33,5 @@ public interface BaseNavigator {
      * @param extraKey   the key for the extra that is passed in the Intent.
      * @param extraValue the value for the extra the is passed in the Intent.
      */
-    void startActivityForResultWithExtra(Class cls, int requestCode, String extraKey, String extraValue);
+    void startActivityForResultWithExtra(Class cls, int requestCode, String extraKey, Integer extraValue);
 }

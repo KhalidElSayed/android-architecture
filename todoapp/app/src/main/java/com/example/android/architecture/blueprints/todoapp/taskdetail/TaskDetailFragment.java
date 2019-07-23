@@ -258,9 +258,9 @@ public class TaskDetailFragment extends Fragment {
     }
 
     @Nullable
-    private String getTaskId() {
+    private Integer getTaskId() {
         if (getArguments() != null) {
-            return getArguments().getString(ARGUMENT_TASK_ID);
+            return getArguments().getInt(ARGUMENT_TASK_ID);
         }
         return null;
     }

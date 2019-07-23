@@ -16,7 +16,7 @@ class TaskDetailModule {
 
     @NonNull
     public static TaskDetailViewModel createTaskDetailsViewModel(
-            @Nullable String taskId,
+            @Nullable Integer taskId,
             @NonNull Activity activity) {
         Context appContext = activity.getApplicationContext();
         BaseNavigator navigationProvider = Injection.createNavigationProvider(activity);

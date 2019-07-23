@@ -48,7 +48,7 @@ public class TasksNavigator {
      *
      * @param taskId id of the task.
      */
-    void openTaskDetails(String taskId) {
+    void openTaskDetails(Integer taskId) {
         mNavigationProvider.startActivityForResultWithExtra(TaskDetailActivity.class, -1,
                 TaskDetailActivity.EXTRA_TASK_ID, taskId);
     }

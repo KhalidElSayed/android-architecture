@@ -4,7 +4,6 @@ package com.example.android.architecture.blueprints.todoapp.addedittask;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.data.model.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
-import com.google.common.base.Strings;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -32,7 +31,7 @@ public class AddEditTaskViewModel {
     private final PublishSubject<Integer> mSnackbarText;
 
     @Nullable
-    private String mTaskId;
+    private Integer mTaskId;
 
     @Nullable
     private String mRestoredTitle;
@@ -40,7 +39,7 @@ public class AddEditTaskViewModel {
     @Nullable
     private String mRestoredDescription;
 
-    public AddEditTaskViewModel(@Nullable String taskId, @NonNull TasksRepository tasksRepository,
+    public AddEditTaskViewModel(@Nullable Integer taskId, @NonNull TasksRepository tasksRepository,
                                 @NonNull AddEditTaskNavigator navigator) {
         mTasksRepository = checkNotNull(tasksRepository, "TaskRepository cannot be null");
         mNavigator = checkNotNull(navigator, "navigator cannot be null");
@@ -62,7 +61,8 @@ public class AddEditTaskViewModel {
      */
     @NonNull
     public Observable<AddEditTaskUiModel> getUiModel() {
-        if (Strings.isNullOrEmpty(mTaskId)) {
+//        if (Strings.isNullOrEmpty(mTaskId)) {
+        if (mTaskId == null) {
             // new task. nothing to do here.
             return Observable.empty();
         }
@@ -111,12 +111,14 @@ public class AddEditTaskViewModel {
         Task newTask;
         if (isNewTask()) {
             newTask = new Task(title, description);
+            // TODO: this check should be moved to the view (activity)
             if (newTask.isEmpty()) {
                 showSnackbar(R.string.empty_task_message);
                 return Completable.complete();
             }
         } else {
-            newTask = new Task(title, description, mTaskId);
+            // TODO: this behaviour will be moved to the view (activity)
+            newTask = new Task(title, description/*, mTaskId*/);
         }
         return mTasksRepository.saveTask(newTask);
     }

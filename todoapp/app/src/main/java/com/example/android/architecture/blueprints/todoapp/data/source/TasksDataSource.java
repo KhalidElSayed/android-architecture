@@ -28,7 +28,6 @@ import io.reactivex.Single;
 
 /**
  * Main entry point for accessing tasks data.
- * <p>
  */
 public interface TasksDataSource {
 
@@ -36,7 +35,7 @@ public interface TasksDataSource {
     Single<List<Task>> getTasks();
 
     @NonNull
-    Observable<Task> getTask(@NonNull String taskId);
+    Observable<Task> getTask(@NonNull Integer taskId);
 
     @NonNull
     Completable saveTask(@NonNull Task task);
@@ -48,18 +47,18 @@ public interface TasksDataSource {
     Completable completeTask(@NonNull Task task);
 
     @NonNull
-    Completable completeTask(@NonNull String taskId);
+    Completable completeTask(@NonNull Integer taskId);
 
     Completable activateTask(@NonNull Task task);
 
-    Completable activateTask(@NonNull String taskId);
+    Completable activateTask(@NonNull Integer taskId);
 
     void clearCompletedTasks();
 
     @NonNull
     Completable refreshTasks();
 
-    void deleteAllTasks();
+    void deleteTask(@NonNull Integer taskId);
 
-    void deleteTask(@NonNull String taskId);
+    void deleteAllTasks();
 }

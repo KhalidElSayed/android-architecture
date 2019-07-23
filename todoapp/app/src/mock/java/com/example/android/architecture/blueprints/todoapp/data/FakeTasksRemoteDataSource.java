@@ -37,7 +37,7 @@ import io.reactivex.Single;
  */
 public class FakeTasksRemoteDataSource implements TasksDataSource {
 
-    private static final Map<String, Task> TASKS_SERVICE_DATA = new LinkedHashMap<>();
+    private static final Map<Integer, Task> TASKS_SERVICE_DATA = new LinkedHashMap<>();
     private static FakeTasksRemoteDataSource INSTANCE;
 
     // Prevent direct instantiation.
@@ -58,7 +58,7 @@ public class FakeTasksRemoteDataSource implements TasksDataSource {
     }
 
     @Override
-    public Observable<Task> getTask(@NonNull String taskId) {
+    public Observable<Task> getTask(@NonNull Integer taskId) {
         Task task = TASKS_SERVICE_DATA.get(taskId);
         return Observable.just(task);
     }
@@ -85,7 +85,7 @@ public class FakeTasksRemoteDataSource implements TasksDataSource {
     }
 
     @Override
-    public Completable completeTask(@NonNull String taskId) {
+    public Completable completeTask(@NonNull Integer taskId) {
         return Completable.fromAction(() -> {
             Task task = TASKS_SERVICE_DATA.get(taskId);
             Task completedTask = new Task(task.getTitle(), task.getDescription(), task.getId(), true);
@@ -102,7 +102,7 @@ public class FakeTasksRemoteDataSource implements TasksDataSource {
     }
 
     @Override
-    public Completable activateTask(@NonNull String taskId) {
+    public Completable activateTask(@NonNull Integer taskId) {
         return Completable.fromAction(() -> {
             Task task = TASKS_SERVICE_DATA.get(taskId);
             Task activeTask = new Task(task.getTitle(), task.getDescription(), task.getId());
@@ -112,9 +112,9 @@ public class FakeTasksRemoteDataSource implements TasksDataSource {
 
     @Override
     public void clearCompletedTasks() {
-        Iterator<Map.Entry<String, Task>> it = TASKS_SERVICE_DATA.entrySet().iterator();
+        Iterator<Map.Entry<Integer, Task>> it = TASKS_SERVICE_DATA.entrySet().iterator();
         while (it.hasNext()) {
-            Map.Entry<String, Task> entry = it.next();
+            Map.Entry<Integer, Task> entry = it.next();
             if (entry.getValue().isCompleted()) {
                 it.remove();
             }
@@ -126,7 +126,7 @@ public class FakeTasksRemoteDataSource implements TasksDataSource {
     }
 
     @Override
-    public void deleteTask(@NonNull String taskId) {
+    public void deleteTask(@NonNull Integer taskId) {
         TASKS_SERVICE_DATA.remove(taskId);
     }
 

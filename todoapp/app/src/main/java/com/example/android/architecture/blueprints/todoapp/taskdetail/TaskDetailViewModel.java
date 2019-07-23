@@ -42,7 +42,7 @@ public class TaskDetailViewModel {
     private final TasksRepository mTasksRepository;
 
     @Nullable
-    private final String mTaskId;
+    private final Integer mTaskId;
 
     @NonNull
     private final TaskDetailNavigator mNavigator;
@@ -57,7 +57,7 @@ public class TaskDetailViewModel {
     @NonNull
     private final PublishSubject<Integer> mSnackbarText;
 
-    public TaskDetailViewModel(@Nullable String taskId,
+    public TaskDetailViewModel(@Nullable Integer taskId,
                                @NonNull TasksRepository tasksRepository,
                                @NonNull TaskDetailNavigator navigator) {
         mTaskId = taskId;
@@ -82,7 +82,8 @@ public class TaskDetailViewModel {
      */
     @NonNull
     public Observable<TaskUiModel> getTaskUiModel() {
-        if (Strings.isNullOrEmpty(mTaskId)) {
+        //if (Strings.isNullOrEmpty(mTaskId)) {
+        if (mTaskId == null) {
             return Observable.error(new Exception("Task id null or empty"));
         }
 
@@ -129,7 +130,8 @@ public class TaskDetailViewModel {
     @NonNull
     public Completable editTask() {
         return Completable.fromAction(() -> {
-            if (Strings.isNullOrEmpty(mTaskId)) {
+            //if (Strings.isNullOrEmpty(mTaskId)) {
+            if (mTaskId == null) {
                 throw new RuntimeException("Task id null or empty");
             }
             mNavigator.onStartEditTask(mTaskId);
@@ -145,7 +147,8 @@ public class TaskDetailViewModel {
     @NonNull
     public Completable deleteTask() {
         return Completable.fromAction(() -> {
-            if (Strings.isNullOrEmpty(mTaskId)) {
+//            if (Strings.isNullOrEmpty(mTaskId)) {
+            if (mTaskId == null) {
                 throw new RuntimeException("Task id null or empty");
             }
             mTasksRepository.deleteTask(mTaskId);
@@ -159,7 +162,8 @@ public class TaskDetailViewModel {
      */
     @NonNull
     public Completable taskCheckChanged(final boolean checked) {
-        if (Strings.isNullOrEmpty(mTaskId)) {
+//        if (Strings.isNullOrEmpty(mTaskId)) {
+        if (mTaskId == null) {
             return Completable.error(new RuntimeException("Task id null or empty"));
         }
         if (checked) {
