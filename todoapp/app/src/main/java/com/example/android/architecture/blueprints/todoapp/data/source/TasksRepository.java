@@ -178,9 +178,9 @@ public class TasksRepository implements TasksDataSource {
      * Delete tasks from remote and local repositories.
      */
     @Override
-    public void deleteAllTasks() {
-        mTasksRemoteDataSource.deleteAllTasks();
-        mTasksLocalDataSource.deleteAllTasks();
+    public Completable deleteAllTasks() {
+      return mTasksRemoteDataSource.deleteAllTasks()
+              .andThen(mTasksLocalDataSource.deleteAllTasks());
     }
 
     /**
@@ -189,8 +189,8 @@ public class TasksRepository implements TasksDataSource {
      * @param taskId a task id
      */
     @Override
-    public void deleteTask(@NonNull Integer taskId) {
-        mTasksRemoteDataSource.deleteTask(checkNotNull(taskId));
-        mTasksLocalDataSource.deleteTask(checkNotNull(taskId));
+    public Completable deleteTask(@NonNull Integer taskId) {
+      return mTasksRemoteDataSource.deleteTask(checkNotNull(taskId))
+              .andThen(mTasksLocalDataSource.deleteTask(checkNotNull(taskId)));
     }
 }

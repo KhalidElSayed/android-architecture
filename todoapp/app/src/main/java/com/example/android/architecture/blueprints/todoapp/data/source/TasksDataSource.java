@@ -58,7 +58,7 @@ public interface TasksDataSource {
     @NonNull
     Completable refreshTasks();
 
-    void deleteTask(@NonNull Integer taskId);
+    Completable deleteTask(@NonNull Integer taskId);
 
-    void deleteAllTasks();
+    Completable deleteAllTasks();
 }

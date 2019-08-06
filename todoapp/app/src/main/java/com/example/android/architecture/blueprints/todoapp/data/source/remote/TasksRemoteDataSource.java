@@ -146,12 +146,12 @@ public class TasksRemoteDataSource implements TasksDataSource {
     }
 
     @Override
-    public void deleteAllTasks() {
-        TASKS_SERVICE_DATA.clear();
+    public Completable deleteTask(@NonNull Integer taskId) {
+        return Completable.fromCallable(() -> TASKS_SERVICE_DATA.remove(taskId));
     }
 
     @Override
-    public void deleteTask(@NonNull Integer taskId) {
-        TASKS_SERVICE_DATA.remove(taskId);
+    public Completable deleteAllTasks() {
+        return Completable.fromAction(TASKS_SERVICE_DATA::clear);
     }
 }

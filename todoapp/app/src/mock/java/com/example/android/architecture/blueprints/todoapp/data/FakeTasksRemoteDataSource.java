@@ -17,6 +17,9 @@
 package com.example.android.architecture.blueprints.todoapp.data;
 
 
+import androidx.annotation.NonNull;
+import androidx.annotation.VisibleForTesting;
+
 import com.example.android.architecture.blueprints.todoapp.data.model.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 
@@ -26,8 +29,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.VisibleForTesting;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
@@ -126,13 +127,13 @@ public class FakeTasksRemoteDataSource implements TasksDataSource {
     }
 
     @Override
-    public void deleteTask(@NonNull Integer taskId) {
-        TASKS_SERVICE_DATA.remove(taskId);
+    public Completable deleteTask(@NonNull Integer taskId) {
+        return Completable.fromCallable(() -> TASKS_SERVICE_DATA.remove(taskId));
     }
 
     @Override
-    public void deleteAllTasks() {
-        TASKS_SERVICE_DATA.clear();
+    public Completable deleteAllTasks() {
+        return Completable.fromAction(TASKS_SERVICE_DATA::clear);
     }
 
     @VisibleForTesting

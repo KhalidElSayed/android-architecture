@@ -18,6 +18,10 @@ package com.example.android.architecture.blueprints.todoapp.data.source.local;
 
 import android.content.Context;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.room.Room;
+
 import com.example.android.architecture.blueprints.todoapp.data.model.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.local.dao.TaskDao;
@@ -25,9 +29,6 @@ import com.example.android.architecture.blueprints.todoapp.util.schedulers.BaseS
 
 import java.util.List;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.room.Room;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
@@ -52,7 +53,7 @@ public class TasksLocalDataSource implements TasksDataSource {
         checkNotNull(context, "context cannot be null");
         checkNotNull(schedulerProvider, "scheduleProvider cannot be null");
         mTaskDao = Room.databaseBuilder(context, TaskDatabase.class, "Tasks.db")
-                .fallbackToDestructiveMigration()
+//                .fallbackToDestructiveMigration()
 //                .addMigrations(TaskDatabase.MIGRATION_1_2)
                 .build()
                 .taskDao();
@@ -150,16 +151,16 @@ public class TasksLocalDataSource implements TasksDataSource {
     }
 
     @Override
-    public void deleteTask(@NonNull Integer taskId) {
+    public Completable deleteTask(@NonNull Integer taskId) {
         /*String selection = TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
         String[] selectionArgs = {taskId};
         mDatabaseHelper.delete(TaskEntry.TABLE_NAME, selection, selectionArgs);*/
-        mTaskDao.deleteTask(taskId);
+        return mTaskDao.deleteTask(taskId);
     }
 
     @Override
-    public void deleteAllTasks() {
-        mTaskDao.deleteAllTasks();
+    public Completable deleteAllTasks() {
+        return mTaskDao.deleteAllTasks();
 //        mDatabaseHelper.delete(TaskEntry.TABLE_NAME, null);
     }
 }

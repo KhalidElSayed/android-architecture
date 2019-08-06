@@ -79,17 +79,17 @@ public interface TaskDao {
      * Delete the completed tasks.
      */
     @Query("DELETE FROM TASKS WHERE completed = :isCompleted")
-    void deleteTask(int isCompleted);
+    Completable deleteTask(int isCompleted);
 
     /**
      * Delete a task.
      */
     @Query("DELETE FROM TASKS WHERE id LIKE :taskId")
-    void deleteTask(Integer taskId);
+    Completable deleteTask(Integer taskId);
 
     /**
      * Delete all tasks.
      */
     @Query("DELETE FROM TASKS")
-    void deleteAllTasks();
+    Completable deleteAllTasks();
 }
