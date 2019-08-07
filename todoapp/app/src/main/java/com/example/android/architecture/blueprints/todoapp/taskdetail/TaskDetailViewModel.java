@@ -18,13 +18,15 @@ package com.example.android.architecture.blueprints.todoapp.taskdetail;
 
 import android.app.Activity;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.lifecycle.ViewModel;
+
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.data.model.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.google.common.base.Strings;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.subjects.BehaviorSubject;
@@ -36,7 +38,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Listens to user actions from the UI ({@link TaskDetailFragment}), retrieves the data and edits,
  * deletes, updates, activates and completes the task.
  */
-public class TaskDetailViewModel {
+public class TaskDetailViewModel extends ViewModel {
 
     @NonNull
     private final TasksRepository mTasksRepository;

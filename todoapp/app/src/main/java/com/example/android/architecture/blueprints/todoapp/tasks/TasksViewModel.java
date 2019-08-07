@@ -18,6 +18,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.annotation.VisibleForTesting;
+import androidx.lifecycle.ViewModel;
+
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.subjects.BehaviorSubject;
@@ -28,7 +30,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * ViewModel for the list of tasks.
  */
-public final class TasksViewModel {
+public final class TasksViewModel extends ViewModel {
 
     @VisibleForTesting
     static final String FILTER_KEY = "filter";

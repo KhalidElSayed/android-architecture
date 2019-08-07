@@ -169,11 +169,21 @@ dependencies {
     implementation deps.guava
 
     // Sqlbrite 2
-    implementation deps.sqlbrite
+//    implementation deps.sqlbrite
+
+    // Tray (SharedPreference) Lib
+    implementation deps.tray
 
     // firebase
     implementation deps.firebase.core
 
+    // KProgressHUD Lib
+    implementation deps.kprogresshud
+
+    // Alerter - Beautiful Alert Lib
+    implementation deps.alerter
+
+    // espresso idling
     implementation deps.espresso.idling_resource
 
     // Dependencies for local unit tests

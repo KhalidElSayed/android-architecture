@@ -23,4 +23,7 @@
 
     <drawable name="touchFeedback">#CFD8DC</drawable>
 
+    <!--my colors-->
+    <color name="jade">#FF00AD7C</color>
+    <color name="ruby_red">#ffdd2c00</color>
 </resources>

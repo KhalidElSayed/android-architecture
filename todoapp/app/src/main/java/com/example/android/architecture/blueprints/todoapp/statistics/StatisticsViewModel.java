@@ -24,6 +24,8 @@ import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingRe
 import com.example.android.architecture.blueprints.todoapp.util.providers.BaseResourceProvider;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.ViewModel;
+
 import io.reactivex.Observable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -31,7 +33,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Retrieves the data and exposes updates for the progress of fetching the statistics.
  */
-public class StatisticsViewModel {
+public class StatisticsViewModel extends ViewModel {
 
     @NonNull
     private final TasksRepository mTasksRepository;

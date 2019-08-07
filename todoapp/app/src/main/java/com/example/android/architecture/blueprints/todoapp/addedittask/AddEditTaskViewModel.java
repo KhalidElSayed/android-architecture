@@ -8,6 +8,8 @@ import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepo
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
+import androidx.lifecycle.ViewModel;
+
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
@@ -17,7 +19,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * ViewModel handling the adding and deleting of tasks.
  */
-public class AddEditTaskViewModel {
+public class AddEditTaskViewModel extends ViewModel {
 
     @NonNull
     private final TasksRepository mTasksRepository;
