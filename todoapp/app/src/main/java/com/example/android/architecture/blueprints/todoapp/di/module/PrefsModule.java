@@ -2,6 +2,7 @@ package com.example.android.architecture.blueprints.todoapp.di.module;
 
 import android.app.Application;
 
+import com.example.android.architecture.blueprints.todoapp.ToDoApplication;
 import com.google.gson.Gson;
 
 import net.grandcentrix.tray.AppPreferences;
@@ -24,7 +25,7 @@ public class PrefsModule {
 
   @Provides
   @Singleton
-  public AppPreferences provideAppPreferences(Application application) {
+  public AppPreferences provideAppPreferences(ToDoApplication application) {
     return new AppPreferences(application);
   }
 }

@@ -21,6 +21,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.Route;
 import okhttp3.logging.HttpLoggingInterceptor;
+import timber.log.Timber;
 
 @Singleton
 public class ApiAuthenticator implements Authenticator {
@@ -51,7 +52,7 @@ public class ApiAuthenticator implements Authenticator {
   private String getAccessToken(Class<?> scope) {
     return Single.fromCallable(() -> getToken(scope))
                 .doOnSuccess(token -> saveToken(token, scope))
-                .map(token -> "${it.tokenType} ${it.accessToken}")
+                .map(token -> token.getTokenType() + " " + token.getAccessToken())
                 .blockingGet();
   }
 
@@ -63,27 +64,28 @@ public class ApiAuthenticator implements Authenticator {
     try {
       responseBody = okHttpClient.newCall(authRequest).execute().body().string();
     } catch (IOException e) {
+      Timber.e(e.getMessage());
       e.printStackTrace();
     }
     return StringUtils.toObject(responseBody, Token.class);
   }
 
   private Request buildAuthRequest(Class<?> scope) {
-    // TODO: get all checks for annotation from the retrofit itself
-    // to ensure everything goes well
-    Authentication authentication = (Authentication) scope.getAnnotations()[0];
-
+    Authentication authentication = scope.getAnnotation(Authentication.class);
     if (authentication == null)
-      throw new IllegalArgumentException("@Authentication annotation not found. You should annotate the " +
-              "api interface with @Authentication to add authentication for methods annotated" +
-              " with @AuthScope annotation.");
+      throw new IllegalArgumentException("@Authentication annotation not found. " +
+              "@AuthScope must be used with @Authentication class annotation.");
+
+    StringUtils.validateFields(authentication.fields());
 
     FormBody.Builder formBodyBuilder = new FormBody.Builder();
     for (String field : authentication.fields()) {
+      StringUtils.validateField(field);
       String[] fieldInfo = field.split(": ");
       formBodyBuilder.add(fieldInfo[0], fieldInfo[1]);
     }
 
+    StringUtils.validateUrl(authentication.url());
     Request request = new Request.Builder()
             .url(authentication.url())
             .post(formBodyBuilder.build())

@@ -4,16 +4,17 @@ import android.os.Bundle;
 import android.widget.Toast;
 
 import androidx.annotation.StringRes;
-import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.android.architecture.blueprints.todoapp.util.DialogUtils;
 import com.kaopiz.kprogresshud.KProgressHUD;
+
+import dagger.android.support.DaggerAppCompatActivity;
 
 /**
  * Abstract activity that every other Activity in this application must implement. It handles
  * shown of progress dialogs and toast and implements the baseView.
  */
-public class BaseActivity extends AppCompatActivity implements BaseView {
+public class BaseActivity extends DaggerAppCompatActivity implements BaseView {
 
     private KProgressHUD mProgressHUD;
 

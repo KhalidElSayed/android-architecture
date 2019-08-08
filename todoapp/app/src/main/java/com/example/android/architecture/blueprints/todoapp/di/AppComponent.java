@@ -14,19 +14,13 @@ import javax.inject.Singleton;
 import dagger.BindsInstance;
 import dagger.Component;
 import dagger.android.AndroidInjectionModule;
+import dagger.android.AndroidInjector;
 
 @Singleton
 @Component(modules = {ApiModule.class, RxModule.class, ViewModelModule.class, PrefsModule.class,
         ActivityModule.class, AndroidInjectionModule.class})
-public interface AppComponent {
+public interface AppComponent extends AndroidInjector<ToDoApplication> {
 
   @Component.Builder
-  interface Builder {
-    @BindsInstance
-    Builder application(Application application);
-
-    AppComponent build();
-  }
-
-  void inject(ToDoApplication application);
+  abstract class Builder extends AndroidInjector.Builder<ToDoApplication> { }
 }

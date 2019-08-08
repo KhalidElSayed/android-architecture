@@ -31,7 +31,9 @@ public class ApiModule {
     } else {
       return "http://192.168.50.15:83/api/";
     }*/
-    return "http://www.amock.io/api/";
+
+//        return "http://www.amock.io/api/";
+    return "https://user.nagwa.com/user/";
   }
 
   @Provides
@@ -72,7 +74,7 @@ public class ApiModule {
   @Provides
   @Singleton
   @Named("todoApi")
-  TodoApi provideTodoApi(/*@Named("BaseUrl")*/ @BaseUrl String baseUrl, ApiHelper apiHelper) {
+  TodoApi provideTodoApi(@BaseUrl String baseUrl, ApiHelper apiHelper) {
     return apiHelper.getAPI(baseUrl, TodoApi.class);
   }
 

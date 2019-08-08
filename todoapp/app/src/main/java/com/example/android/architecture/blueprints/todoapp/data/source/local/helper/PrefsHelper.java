@@ -17,11 +17,10 @@ import javax.inject.Singleton;
 public class PrefsHelper {
 
   private AppPreferences mPrefs;
-  @Named("prefsGson")
   private Gson gson;
 
   @Inject
-  public PrefsHelper(AppPreferences mPrefs, Gson gson) {
+  public PrefsHelper(AppPreferences mPrefs, @Named("prefsGson") Gson gson) {
     this.mPrefs = mPrefs;
     this.gson = gson;
   }

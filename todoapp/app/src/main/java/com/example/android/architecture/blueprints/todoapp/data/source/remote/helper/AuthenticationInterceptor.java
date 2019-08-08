@@ -56,7 +56,7 @@ public class AuthenticationInterceptor implements Interceptor {
     // get the accessToken
     Token token = prefsHelper.getObject(authScope.scope().getSimpleName(), Token.class);
     if (token != null) {
-      accessToken = "${it.tokenType} ${it.accessToken}";
+      accessToken = token.getTokenType() + " " + token.getAccessToken();
     }
 
     return accessToken;

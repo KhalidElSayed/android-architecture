@@ -16,11 +16,10 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class ApiHelper {
 
   private OkHttpClient okHttpClient;
-  @Named("apiGson")
   private Gson gson;
 
   @Inject
-  public ApiHelper(OkHttpClient okHttpClient, Gson gson) {
+  public ApiHelper(OkHttpClient okHttpClient, @Named("apiGson") Gson gson) {
     this.okHttpClient = okHttpClient;
     this.gson = gson;
   }

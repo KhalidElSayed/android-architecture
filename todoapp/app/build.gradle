@@ -183,6 +183,8 @@ dependencies {
     // Alerter - Beautiful Alert Lib
     implementation deps.alerter
 
+    implementation deps.timber
+
     // espresso idling
     implementation deps.espresso.idling_resource
 

@@ -22,9 +22,6 @@ import retrofit2.http.POST;
                   "scope: UserManagementApi"})
 public interface TodoApi {
 
-  // ---------------- Endpoints URLs -------------------//
-  String TASKS_URL = "tasks";
-
   @AuthScope(scope = TodoApi.class)
   @Headers("api-version: 2")
   @POST("PortalsLogin")
@@ -33,4 +30,7 @@ public interface TodoApi {
   @NoAuth
   @GET(TASKS_URL)
   Single<List<Task>> getTasks();
+
+  // ---------------- Endpoints URLs -------------------//
+  String TASKS_URL = "tasks";
 }
