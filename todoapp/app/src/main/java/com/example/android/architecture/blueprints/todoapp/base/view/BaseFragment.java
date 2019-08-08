@@ -2,13 +2,13 @@ package com.example.android.architecture.blueprints.todoapp.base.view;
 
 import android.widget.Toast;
 
-import androidx.annotation.StringRes;
-import androidx.fragment.app.Fragment;
-
 import com.example.android.architecture.blueprints.todoapp.util.DialogUtils;
 import com.kaopiz.kprogresshud.KProgressHUD;
 
-public class BaseFragment extends Fragment implements BaseView {
+import androidx.annotation.StringRes;
+import dagger.android.support.DaggerFragment;
+
+public class BaseFragment extends DaggerFragment implements BaseView {
 
     private KProgressHUD mProgressHUD;
 

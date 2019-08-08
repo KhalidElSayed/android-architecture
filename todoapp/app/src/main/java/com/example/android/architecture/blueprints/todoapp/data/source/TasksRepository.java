@@ -18,12 +18,16 @@ package com.example.android.architecture.blueprints.todoapp.data.source;
 
 
 import com.example.android.architecture.blueprints.todoapp.data.model.Task;
+import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksLocalDataSource;
+import com.example.android.architecture.blueprints.todoapp.data.source.remote.TasksRemoteDataSource;
 import com.example.android.architecture.blueprints.todoapp.util.schedulers.BaseSchedulerProvider;
 
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
@@ -37,10 +41,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * obtained from the server, by using the remote data source only if the local database doesn't
  * exist or is empty.
  */
+@Singleton
 public class TasksRepository implements TasksDataSource {
 
-    @Nullable
-    private static TasksRepository INSTANCE = null;
+//    @Nullable
+//    private static TasksRepository INSTANCE = null;
 
     @NonNull
     private final TasksDataSource mTasksRemoteDataSource;
@@ -51,9 +56,9 @@ public class TasksRepository implements TasksDataSource {
     @NonNull
     private final BaseSchedulerProvider mBaseSchedulerProvider;
 
-    // Prevent direct instantiation.
-    private TasksRepository(@NonNull TasksDataSource tasksRemoteDataSource,
-                            @NonNull TasksDataSource tasksLocalDataSource,
+    @Inject
+    public TasksRepository(@NonNull TasksRemoteDataSource tasksRemoteDataSource,
+                            @NonNull TasksLocalDataSource tasksLocalDataSource,
                             @NonNull BaseSchedulerProvider schedulerProvider) {
         mTasksRemoteDataSource = checkNotNull(tasksRemoteDataSource);
         mTasksLocalDataSource = checkNotNull(tasksLocalDataSource);
@@ -67,7 +72,7 @@ public class TasksRepository implements TasksDataSource {
      * @param tasksLocalDataSource  the device storage data source
      * @return the {@link TasksRepository} instance
      */
-    public static TasksRepository getInstance(@NonNull TasksDataSource tasksRemoteDataSource,
+    /*public static TasksRepository getInstance(@NonNull TasksDataSource tasksRemoteDataSource,
                                               @NonNull TasksDataSource tasksLocalDataSource,
                                               @NonNull BaseSchedulerProvider schedulerProvider) {
         if (INSTANCE == null) {
@@ -75,15 +80,15 @@ public class TasksRepository implements TasksDataSource {
                     schedulerProvider);
         }
         return INSTANCE;
-    }
+    }*/
 
     /**
      * Used to force {@link #getInstance(TasksDataSource, TasksDataSource, BaseSchedulerProvider)}
      * to create a new instance next time it's called.
      */
-    public static void destroyInstance() {
+    /*public static void destroyInstance() {
         INSTANCE = null;
-    }
+    }*/
 
     /**
      * Gets tasks from  local data source (Room Db).
@@ -169,7 +174,7 @@ public class TasksRepository implements TasksDataSource {
     @Override
     public Completable refreshTasks() {
         return mTasksRemoteDataSource.getTasks()
-                .subscribeOn(mBaseSchedulerProvider.io())
+//                .subscribeOn(mBaseSchedulerProvider.io())
                 .doOnSuccess(mTasksLocalDataSource::saveTasks)
                 .ignoreElement();
     }

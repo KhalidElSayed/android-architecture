@@ -18,10 +18,6 @@ package com.example.android.architecture.blueprints.todoapp.data.source.local;
 
 import android.content.Context;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.room.Room;
-
 import com.example.android.architecture.blueprints.todoapp.data.model.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.local.dao.TaskDao;
@@ -29,6 +25,11 @@ import com.example.android.architecture.blueprints.todoapp.util.schedulers.BaseS
 
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
@@ -39,27 +40,25 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Concrete implementation of a data source as a db.
  */
+@Singleton
 public class TasksLocalDataSource implements TasksDataSource {
 
-    @Nullable
-    private static TasksLocalDataSource INSTANCE;
+//    @Nullable
+//    private static TasksLocalDataSource INSTANCE;
 
     @NonNull
     private final TaskDao mTaskDao;
 
-    // Prevent direct instantiation.
-    private TasksLocalDataSource(@NonNull Context context,
-                                 @NonNull BaseSchedulerProvider schedulerProvider) {
+    @Inject
+    public TasksLocalDataSource(@NonNull Context context,
+                                 @NonNull BaseSchedulerProvider schedulerProvider,
+                                 TaskDao taskDao) {
         checkNotNull(context, "context cannot be null");
         checkNotNull(schedulerProvider, "scheduleProvider cannot be null");
-        mTaskDao = Room.databaseBuilder(context, TaskDatabase.class, "Tasks.db")
-//                .fallbackToDestructiveMigration()
-//                .addMigrations(TaskDatabase.MIGRATION_1_2)
-                .build()
-                .taskDao();
+        mTaskDao = taskDao;
     }
 
-    public static TasksLocalDataSource getInstance(
+    /*public static TasksLocalDataSource getInstance(
             @NonNull Context context,
             @NonNull BaseSchedulerProvider schedulerProvider) {
         if (INSTANCE == null) {
@@ -70,7 +69,7 @@ public class TasksLocalDataSource implements TasksDataSource {
 
     public static void destroyInstance() {
         INSTANCE = null;
-    }
+    }*/
 
     /**
      * @return an Observable that emits the list of tasks in the database, every time the Tasks
