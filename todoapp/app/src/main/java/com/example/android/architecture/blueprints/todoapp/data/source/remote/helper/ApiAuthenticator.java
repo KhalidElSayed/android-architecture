@@ -76,16 +76,16 @@ public class ApiAuthenticator implements Authenticator {
       throw new IllegalArgumentException("@Authentication annotation not found. " +
               "@AuthScope must be used with @Authentication class annotation.");
 
-    StringUtils.validateFields(authentication.fields());
+    NetworkUtils.validateFields(authentication.fields());
 
     FormBody.Builder formBodyBuilder = new FormBody.Builder();
     for (String field : authentication.fields()) {
-      StringUtils.validateField(field);
+      NetworkUtils.validateField(field);
       String[] fieldInfo = field.split(": ");
       formBodyBuilder.add(fieldInfo[0], fieldInfo[1]);
     }
 
-    StringUtils.validateUrl(authentication.url());
+    NetworkUtils.validateUrl(authentication.url());
     Request request = new Request.Builder()
             .url(authentication.url())
             .post(formBodyBuilder.build())

@@ -5,6 +5,8 @@ import android.content.Intent;
 
 import java.lang.ref.WeakReference;
 
+import javax.inject.Inject;
+
 /**
  * Implementation of the {@link BaseNavigator}.
  */
@@ -12,6 +14,7 @@ public final class Navigator implements BaseNavigator {
 
     private final WeakReference<Activity> mActivity;
 
+    @Inject
     public Navigator(Activity activity) {
         mActivity = new WeakReference<>(activity);
     }
