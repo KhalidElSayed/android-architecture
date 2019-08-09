@@ -24,12 +24,16 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.android.architecture.blueprints.todoapp.R;
+import com.example.android.architecture.blueprints.todoapp.base.view.BaseFragment;
+import com.example.android.architecture.blueprints.todoapp.base.viewmodel.ViewModelFactory;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
+import javax.inject.Inject;
+
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
-import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProviders;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
@@ -37,7 +41,7 @@ import io.reactivex.schedulers.Schedulers;
 /**
  * Main UI for the add task screen. Users can enter a task title and description.
  */
-public class AddEditTaskFragment extends Fragment {
+public class AddEditTaskFragment extends BaseFragment {
 
     public static final String ARGUMENT_EDIT_TASK_ID = "EDIT_TASK_ID";
     private static final String TASK_TITLE_KEY = "title";
@@ -48,9 +52,17 @@ public class AddEditTaskFragment extends Fragment {
 
     private TextView mDescription;
 
+    @Inject
+    ViewModelFactory viewModelFactory;
+    @Nullable
     private AddEditTaskViewModel mViewModel;
 
-    private CompositeDisposable mSubscription = new CompositeDisposable();
+    /**
+     * using a CompositeSubscription to gather all the subscriptions
+     * so all of them can be later unsubscribed together
+     * */
+    @Inject
+    CompositeDisposable mDisposable;
 
     public static AddEditTaskFragment newInstance(String taskId) {
         Bundle arguments = new Bundle();
@@ -71,7 +83,7 @@ public class AddEditTaskFragment extends Fragment {
 
         setupFab();
 
-        mViewModel = AddEditTaskModule.createAddEditTaskViewModel(getTaskId(), getActivity());
+        mViewModel = ViewModelProviders.of(this, viewModelFactory).get(AddEditTaskViewModel.class);
         restoreData(savedInstanceState);
 
         return root;
@@ -90,13 +102,9 @@ public class AddEditTaskFragment extends Fragment {
     }
 
     private void bindViewModel() {
-        // using a CompositeSubscription to gather all the subscriptions, so all of them can be
-        // later unsubscribed together
-        mSubscription = new CompositeDisposable();
-
         // subscribe to the emissions of the snackbar text.
         // whenever a new snackbar text is emitted, show the snackbar
-        mSubscription.add(mViewModel.getSnackbarText()
+        mDisposable.add(mViewModel.getSnackbarText()
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
@@ -108,7 +116,7 @@ public class AddEditTaskFragment extends Fragment {
         // The ViewModel holds an observable containing the state of the UI.
         // subscribe to the emissions of the UiModel
         // every time a new UiModel is emitted update the Ui
-        mSubscription.add(mViewModel.getUiModel()
+        mDisposable.add(mViewModel.getUiModel(getTaskId())
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
@@ -120,16 +128,16 @@ public class AddEditTaskFragment extends Fragment {
     }
 
     private void unbindViewModel() {
-        // unsubscribing from all the subscriptions to ensure we don't have any memory leaks
-        mSubscription.dispose();
+        // disposing from all the subscriptions to ensure we don't have any memory leaks
+        mDisposable.dispose();
     }
 
     private void restoreData(@Nullable Bundle bundle) {
         if (bundle == null) {
             return;
         }
-        mViewModel.setRestoredState(bundle.getString(TASK_TITLE_KEY),
-                bundle.getString(TASK_DESCRIPTION_KEY));
+        /*mViewModel.setRestoredState(bundle.getString(TASK_TITLE_KEY),
+                bundle.getString(TASK_DESCRIPTION_KEY));*/
     }
 
     @Override
@@ -149,7 +157,7 @@ public class AddEditTaskFragment extends Fragment {
     private void saveTask() {
         String title = mTitle.getText().toString();
         String description = mDescription.getText().toString();
-        mSubscription.add(mViewModel.saveTask(title, description)
+        mDisposable.add(mViewModel.saveTask(getTaskId(), title, description)
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
@@ -175,6 +183,5 @@ public class AddEditTaskFragment extends Fragment {
             return getArguments().getInt(ARGUMENT_EDIT_TASK_ID);
         }
         return null;
-
     }
 }

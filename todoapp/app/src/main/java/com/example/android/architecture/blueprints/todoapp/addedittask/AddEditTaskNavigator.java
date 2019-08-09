@@ -4,6 +4,10 @@ import android.app.Activity;
 
 import com.example.android.architecture.blueprints.todoapp.util.providers.BaseNavigator;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import androidx.annotation.NonNull;
 
 /**
@@ -14,7 +18,8 @@ public class AddEditTaskNavigator {
     @NonNull
     private final BaseNavigator mNavigationProvider;
 
-    public AddEditTaskNavigator(@NonNull BaseNavigator navigationProvider) {
+    @Inject
+    public AddEditTaskNavigator(@NonNull @Named("AddEditTaskNavigationProvider") BaseNavigator navigationProvider) {
         mNavigationProvider = navigationProvider;
     }
 

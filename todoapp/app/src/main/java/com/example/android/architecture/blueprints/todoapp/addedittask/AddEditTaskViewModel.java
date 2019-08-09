@@ -2,14 +2,15 @@ package com.example.android.architecture.blueprints.todoapp.addedittask;
 
 
 import com.example.android.architecture.blueprints.todoapp.R;
+import com.example.android.architecture.blueprints.todoapp.base.viewmodel.BaseViewModel;
 import com.example.android.architecture.blueprints.todoapp.data.model.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
+
+import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
-import androidx.lifecycle.ViewModel;
-
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
@@ -19,7 +20,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * ViewModel handling the adding and deleting of tasks.
  */
-public class AddEditTaskViewModel extends ViewModel {
+public class AddEditTaskViewModel extends BaseViewModel {
 
     @NonNull
     private final TasksRepository mTasksRepository;
@@ -27,25 +28,27 @@ public class AddEditTaskViewModel extends ViewModel {
     @NonNull
     private final AddEditTaskNavigator mNavigator;
 
-    // using a PublishSubject because we are not interested in the last object that was emitted
-    // before subscribing. Like this we avoid displaying the snackbar multiple times
+    /**
+     * using a PublishSubject because we are not interested in the last object that was emitted
+     * before subscribing. Like this we avoid displaying the snackbar multiple times
+     * */
     @NonNull
     private final PublishSubject<Integer> mSnackbarText;
 
-    @Nullable
-    private Integer mTaskId;
+    /*@Nullable
+    private Integer mTaskId;*/
 
-    @Nullable
+    /*@Nullable
     private String mRestoredTitle;
 
     @Nullable
-    private String mRestoredDescription;
+    private String mRestoredDescription;*/
 
-    public AddEditTaskViewModel(@Nullable Integer taskId, @NonNull TasksRepository tasksRepository,
+    @Inject
+    public AddEditTaskViewModel(@NonNull TasksRepository tasksRepository,
                                 @NonNull AddEditTaskNavigator navigator) {
         mTasksRepository = checkNotNull(tasksRepository, "TaskRepository cannot be null");
         mNavigator = checkNotNull(navigator, "navigator cannot be null");
-        mTaskId = taskId;
         mSnackbarText = PublishSubject.create();
     }
 
@@ -62,14 +65,14 @@ public class AddEditTaskViewModel extends ViewModel {
      * @return a stream containing the model for the UI.
      */
     @NonNull
-    public Observable<AddEditTaskUiModel> getUiModel() {
+    public Observable<AddEditTaskUiModel> getUiModel(@Nullable Integer taskId) {
 //        if (Strings.isNullOrEmpty(mTaskId)) {
-        if (mTaskId == null) {
+        if (taskId == null) {
             // new task. nothing to do here.
             return Observable.empty();
         }
         return mTasksRepository
-                .getTask(mTaskId)
+                .getTask(taskId)
                 .map(this::restoreTask)
                 .doOnError(__ -> showSnackbar(R.string.empty_task_message))
                 .map(task -> new AddEditTaskUiModel(task.getTitle(), task.getDescription()));
@@ -81,14 +84,14 @@ public class AddEditTaskViewModel extends ViewModel {
      * @param title       the restored title.
      * @param description the restored description.
      */
-    public void setRestoredState(@Nullable String title, @Nullable String description) {
+    /*public void setRestoredState(@Nullable String title, @Nullable String description) {
         mRestoredTitle = title;
         mRestoredDescription = description;
-    }
+    }*/
 
     private Task restoreTask(Task task) {
-        String title = mRestoredTitle != null ? mRestoredTitle : task.getTitle();
-        String description = mRestoredDescription != null ? mRestoredDescription : task.getDescription();
+        String title = /*mRestoredTitle != null ? mRestoredTitle :*/ task.getTitle();
+        String description = /*mRestoredDescription != null ? mRestoredDescription :*/ task.getDescription();
 
         return new Task(title, description, task.getId());
     }
@@ -100,18 +103,18 @@ public class AddEditTaskViewModel extends ViewModel {
      * @param description description of the task
      */
     @NonNull
-    public Completable saveTask(String title, String description) {
-        return createTask(title, description)
+    public Completable saveTask(@Nullable Integer taskId, String title, String description) {
+        return createTask(taskId, title, description)
                 .doOnComplete(mNavigator::onTaskSaved);
     }
 
-    private boolean isNewTask() {
-        return mTaskId == null;
+    private boolean isNewTask(@Nullable Integer taskId) {
+        return taskId == null;
     }
 
-    private Completable createTask(String title, String description) {
+    private Completable createTask(@Nullable Integer taskId, String title, String description) {
         Task newTask;
-        if (isNewTask()) {
+        if (isNewTask(taskId)) {
             newTask = new Task(title, description);
             // TODO: this check should be moved to the view (activity)
             if (newTask.isEmpty()) {
