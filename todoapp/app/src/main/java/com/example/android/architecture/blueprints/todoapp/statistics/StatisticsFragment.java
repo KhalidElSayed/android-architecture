@@ -23,11 +23,15 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.android.architecture.blueprints.todoapp.R;
+import com.example.android.architecture.blueprints.todoapp.base.view.BaseFragment;
+import com.example.android.architecture.blueprints.todoapp.base.viewmodel.ViewModelFactory;
 import com.google.common.base.Preconditions;
+
+import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProviders;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
@@ -35,17 +39,23 @@ import io.reactivex.schedulers.Schedulers;
 /**
  * Main UI for the statistics screen.
  */
-public class StatisticsFragment extends Fragment {
+public class StatisticsFragment extends BaseFragment {
 
     private static final String TAG = StatisticsFragment.class.getSimpleName();
 
     private TextView mStatisticsTV;
 
+    @Inject
+    ViewModelFactory viewModelFactory;
     @Nullable
     private StatisticsViewModel mViewModel;
 
-    @Nullable
-    private CompositeDisposable mSubscription;
+    /**
+     * using a CompositeSubscription to gather all the subscriptions
+     * so all of them can be later unsubscribed together
+     * */
+    @Inject
+    private CompositeDisposable mDisposable;
 
     public static StatisticsFragment newInstance() {
         return new StatisticsFragment();
@@ -58,7 +68,7 @@ public class StatisticsFragment extends Fragment {
         View root = inflater.inflate(R.layout.statistics_frag, container, false);
         mStatisticsTV = root.findViewById(R.id.statistics);
 
-        mViewModel = StatisticsModule.createStatisticsViewModel(getContext());
+        mViewModel = ViewModelProviders.of(this, viewModelFactory).get(StatisticsViewModel.class);
 
         return root;
     }
@@ -77,14 +87,11 @@ public class StatisticsFragment extends Fragment {
 
     private void bindViewModel() {
         Preconditions.checkNotNull(mViewModel);
-        // using a CompositeSubscription to gather all the subscriptions
-        // so all of them can be later unsubscribed together
-        mSubscription = new CompositeDisposable();
 
         // The ViewModel holds an observable containing the state of the UI.
         // subscribe to the emissions of the UiModel
         // every time a new Ui Model is emitted, update the statistics
-        mSubscription.add(mViewModel.getUiModel()
+        mDisposable.add(mViewModel.getUiModel()
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
@@ -95,9 +102,9 @@ public class StatisticsFragment extends Fragment {
     }
 
     private void unbindViewModel() {
-        Preconditions.checkNotNull(mSubscription);
-        // unsubscribing from all the subscriptions to ensure we don't have any memory leaks
-        mSubscription.dispose();
+        Preconditions.checkNotNull(mDisposable);
+        // disposing from all the subscriptions to ensure we don't have any memory leaks
+        mDisposable.dispose();
     }
 
     private void updateStatistics(@NonNull StatisticsUiModel statistics) {

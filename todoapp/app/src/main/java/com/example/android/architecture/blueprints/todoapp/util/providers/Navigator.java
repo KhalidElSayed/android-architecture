@@ -14,7 +14,6 @@ public final class Navigator implements BaseNavigator {
 
     private final WeakReference<Activity> mActivity;
 
-    @Inject
     public Navigator(Activity activity) {
         mActivity = new WeakReference<>(activity);
     }

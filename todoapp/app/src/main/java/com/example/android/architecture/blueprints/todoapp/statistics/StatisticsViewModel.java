@@ -18,14 +18,15 @@ package com.example.android.architecture.blueprints.todoapp.statistics;
 
 
 import com.example.android.architecture.blueprints.todoapp.R;
+import com.example.android.architecture.blueprints.todoapp.base.viewmodel.BaseViewModel;
 import com.example.android.architecture.blueprints.todoapp.data.model.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
 import com.example.android.architecture.blueprints.todoapp.util.providers.BaseResourceProvider;
 
-import androidx.annotation.NonNull;
-import androidx.lifecycle.ViewModel;
+import javax.inject.Inject;
 
+import androidx.annotation.NonNull;
 import io.reactivex.Observable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -33,7 +34,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Retrieves the data and exposes updates for the progress of fetching the statistics.
  */
-public class StatisticsViewModel extends ViewModel {
+public class StatisticsViewModel extends BaseViewModel {
 
     @NonNull
     private final TasksRepository mTasksRepository;
@@ -41,6 +42,7 @@ public class StatisticsViewModel extends ViewModel {
     @NonNull
     private final BaseResourceProvider mResourceProvider;
 
+    @Inject
     public StatisticsViewModel(@NonNull TasksRepository tasksRepository,
                                @NonNull BaseResourceProvider resourceProvider) {
         mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null");
@@ -60,7 +62,7 @@ public class StatisticsViewModel extends ViewModel {
                 .refreshTasks()
                 .andThen(mTasksRepository.getTasks()
                         .toObservable())
-                .flatMap(Observable::fromIterable);
+                .flatMapIterable(allTask -> allTask);
 
         Observable<Long> completedTasks = tasks.filter(Task::isCompleted).count().toObservable();
         Observable<Long> activeTasks = tasks.filter(Task::isActive).count().toObservable();

@@ -13,13 +13,11 @@ import androidx.annotation.StringRes;
 /**
  * Concrete implementation of the {@link BaseResourceProvider} interface.
  */
-@Singleton
 public class ResourceProvider implements BaseResourceProvider {
 
     @NonNull
     private final Context mContext;
 
-    @Inject
     public ResourceProvider(@NonNull Context context) {
         mContext = Preconditions.checkNotNull(context, "context cannot be null");
     }
