@@ -16,12 +16,9 @@
 
 package com.example.android.architecture.blueprints.todoapp.data.source.local;
 
-import android.content.Context;
-
 import com.example.android.architecture.blueprints.todoapp.data.model.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 import com.example.android.architecture.blueprints.todoapp.data.source.local.dao.TaskDao;
-import com.example.android.architecture.blueprints.todoapp.util.schedulers.BaseSchedulerProvider;
 
 import java.util.List;
 
@@ -29,7 +26,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
@@ -43,33 +39,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Singleton
 public class TasksLocalDataSource implements TasksDataSource {
 
-//    @Nullable
-//    private static TasksLocalDataSource INSTANCE;
-
     @NonNull
     private final TaskDao mTaskDao;
 
     @Inject
-    public TasksLocalDataSource(@NonNull Context context,
-                                 @NonNull BaseSchedulerProvider schedulerProvider,
-                                 TaskDao taskDao) {
-        checkNotNull(context, "context cannot be null");
-        checkNotNull(schedulerProvider, "scheduleProvider cannot be null");
+    public TasksLocalDataSource(TaskDao taskDao) {
         mTaskDao = taskDao;
     }
-
-    /*public static TasksLocalDataSource getInstance(
-            @NonNull Context context,
-            @NonNull BaseSchedulerProvider schedulerProvider) {
-        if (INSTANCE == null) {
-            INSTANCE = new TasksLocalDataSource(context, schedulerProvider);
-        }
-        return INSTANCE;
-    }
-
-    public static void destroyInstance() {
-        INSTANCE = null;
-    }*/
 
     /**
      * @return an Observable that emits the list of tasks in the database, every time the Tasks
@@ -105,14 +81,6 @@ public class TasksLocalDataSource implements TasksDataSource {
 
     @Override
     public Completable completeTask(@NonNull Integer taskId) {
-        /*return Completable.fromAction(() -> {
-            ContentValues values = new ContentValues();
-            values.put(TaskEntry.COLUMN_NAME_COMPLETED, true);
-
-            String selection = TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
-            String[] selectionArgs = {taskId};
-//            mDatabaseHelper.update(TaskEntry.TABLE_NAME, values, selection, selectionArgs);
-        });*/
         return mTaskDao.updateTask(1, taskId);
     }
 
@@ -123,22 +91,11 @@ public class TasksLocalDataSource implements TasksDataSource {
 
     @Override
     public Completable activateTask(@NonNull Integer taskId) {
-        /*return Completable.fromAction(() -> {
-            ContentValues values = new ContentValues();
-            values.put(TaskEntry.COLUMN_NAME_COMPLETED, false);
-
-            String selection = TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
-            String[] selectionArgs = {taskId};
-//            mDatabaseHelper.update(TaskEntry.TABLE_NAME, values, selection, selectionArgs);
-        });*/
         return mTaskDao.updateTask(0, taskId);
     }
 
     @Override
     public void clearCompletedTasks() {
-        /*String selection = TaskEntry.COLUMN_NAME_COMPLETED + " LIKE ?";
-        String[] selectionArgs = {"1"};
-        mDatabaseHelper.delete(TaskEntry.TABLE_NAME, selection, selectionArgs);*/
         mTaskDao.deleteTask(1);
     }
 
@@ -151,15 +108,11 @@ public class TasksLocalDataSource implements TasksDataSource {
 
     @Override
     public Completable deleteTask(@NonNull Integer taskId) {
-        /*String selection = TaskEntry.COLUMN_NAME_ENTRY_ID + " LIKE ?";
-        String[] selectionArgs = {taskId};
-        mDatabaseHelper.delete(TaskEntry.TABLE_NAME, selection, selectionArgs);*/
         return mTaskDao.deleteTask(taskId);
     }
 
     @Override
     public Completable deleteAllTasks() {
         return mTaskDao.deleteAllTasks();
-//        mDatabaseHelper.delete(TaskEntry.TABLE_NAME, null);
     }
 }

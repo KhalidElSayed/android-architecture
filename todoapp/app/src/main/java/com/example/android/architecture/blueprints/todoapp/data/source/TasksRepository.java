@@ -44,9 +44,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @Singleton
 public class TasksRepository implements TasksDataSource {
 
-//    @Nullable
-//    private static TasksRepository INSTANCE = null;
-
     @NonNull
     private final TasksDataSource mTasksRemoteDataSource;
 
@@ -64,31 +61,6 @@ public class TasksRepository implements TasksDataSource {
         mTasksLocalDataSource = checkNotNull(tasksLocalDataSource);
         mBaseSchedulerProvider = checkNotNull(schedulerProvider);
     }
-
-    /**
-     * Returns the single instance of this class, creating it if necessary.
-     *
-     * @param tasksRemoteDataSource the backend data source
-     * @param tasksLocalDataSource  the device storage data source
-     * @return the {@link TasksRepository} instance
-     */
-    /*public static TasksRepository getInstance(@NonNull TasksDataSource tasksRemoteDataSource,
-                                              @NonNull TasksDataSource tasksLocalDataSource,
-                                              @NonNull BaseSchedulerProvider schedulerProvider) {
-        if (INSTANCE == null) {
-            INSTANCE = new TasksRepository(tasksRemoteDataSource, tasksLocalDataSource,
-                    schedulerProvider);
-        }
-        return INSTANCE;
-    }*/
-
-    /**
-     * Used to force {@link #getInstance(TasksDataSource, TasksDataSource, BaseSchedulerProvider)}
-     * to create a new instance next time it's called.
-     */
-    /*public static void destroyInstance() {
-        INSTANCE = null;
-    }*/
 
     /**
      * Gets tasks from  local data source (Room Db).
@@ -174,7 +146,7 @@ public class TasksRepository implements TasksDataSource {
     @Override
     public Completable refreshTasks() {
         return mTasksRemoteDataSource.getTasks()
-//                .subscribeOn(mBaseSchedulerProvider.io())
+                .subscribeOn(mBaseSchedulerProvider.io())
                 .doOnSuccess(mTasksLocalDataSource::saveTasks)
                 .ignoreElement();
     }

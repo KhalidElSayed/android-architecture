@@ -29,14 +29,17 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 
 import com.example.android.architecture.blueprints.todoapp.R;
+import com.example.android.architecture.blueprints.todoapp.base.view.BaseFragment;
+import com.example.android.architecture.blueprints.todoapp.base.viewmodel.ViewModelFactory;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.common.base.Preconditions;
+
+import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
-import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProviders;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
@@ -44,7 +47,7 @@ import io.reactivex.schedulers.Schedulers;
 /**
  * Main UI for the task detail screen.
  */
-public class TaskDetailFragment extends Fragment {
+public class TaskDetailFragment extends BaseFragment {
 
     private static final String TAG = TaskDetailFragment.class.getSimpleName();
 
@@ -59,11 +62,17 @@ public class TaskDetailFragment extends Fragment {
 
     private CheckBox mDetailCompleteStatus;
 
+    @Inject
+    ViewModelFactory viewModelFactory;
     @Nullable
     private TaskDetailViewModel mViewModel;
 
-    @Nullable
-    private CompositeDisposable mSubscription;
+    /**
+     * using a CompositeSubscription to gather all the subscriptions, so all of them can be
+     * later unsubscribed together
+     * */
+    @Inject
+    private CompositeDisposable mDisposable;
 
     public static TaskDetailFragment newInstance(@Nullable String taskId) {
         Bundle arguments = new Bundle();
@@ -86,7 +95,7 @@ public class TaskDetailFragment extends Fragment {
 
         setupFab();
 
-        mViewModel = TaskDetailModule.createTaskDetailsViewModel(getTaskId(), getActivity());
+        mViewModel = ViewModelProviders.of(this, viewModelFactory).get(TaskDetailViewModel.class);
 
         return root;
     }
@@ -107,17 +116,13 @@ public class TaskDetailFragment extends Fragment {
         FloatingActionButton fab =
                 getActivity().findViewById(R.id.fab_edit_task);
 
-        fab.setOnClickListener(__ -> editTask());
+        fab.setOnClickListener(__ -> editTask(getTaskId()));
     }
 
     private void bindViewModel() {
-        // using a CompositeSubscription to gather all the subscriptions, so all of them can be
-        // later unsubscribed together
-        mSubscription = new CompositeDisposable();
-
         // subscribe to the emissions of the Ui Model
         // every time a new Ui Model, update the View
-        mSubscription.add(getViewModel().getTaskUiModel()
+        mDisposable.add(mViewModel.getTaskUiModel(getTaskId())
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
@@ -129,7 +134,7 @@ public class TaskDetailFragment extends Fragment {
         // The ViewModel holds an observable containing the state of the UI.
         // subscribe to the emissions of the loading indicator visibility
         // for every emission, update the visibility of the loading indicator
-        mSubscription.add(getViewModel().getLoadingIndicatorVisibility()
+        mDisposable.add(mViewModel.getLoadingIndicatorVisibility()
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
@@ -140,7 +145,7 @@ public class TaskDetailFragment extends Fragment {
 
         // subscribe to the emissions of the snackbar text
         // every time the snackbar text emits, show the snackbar
-        mSubscription.add(getViewModel().getSnackbarText()
+        mDisposable.add(mViewModel.getSnackbarText()
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
@@ -151,15 +156,15 @@ public class TaskDetailFragment extends Fragment {
     }
 
     private void unbindViewModel() {
-        // unsubscribing from all the subscriptions to ensure we don't have any memory leaks
-        getSubscription().dispose();
+        // disposing from all the subscriptions to ensure we don't have any memory leaks
+        mDisposable.dispose();
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_delete:
-                deleteTask();
+                deleteTask(getTaskId());
                 return true;
         }
         return false;
@@ -190,11 +195,11 @@ public class TaskDetailFragment extends Fragment {
     private void showCompletionStatus(final boolean complete) {
         mDetailCompleteStatus.setChecked(complete);
         mDetailCompleteStatus.setOnCheckedChangeListener(
-                (buttonView, isChecked) -> taskCheckChanged(isChecked));
+                (buttonView, isChecked) -> taskCheckChanged(getTaskId(), isChecked));
     }
 
-    private void taskCheckChanged(final boolean checked) {
-        getSubscription().add(getViewModel().taskCheckChanged(checked)
+    private void taskCheckChanged(@Nullable Integer taskId, final boolean checked) {
+        mDisposable.add(mViewModel.taskCheckChanged(taskId, checked)
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
@@ -206,8 +211,8 @@ public class TaskDetailFragment extends Fragment {
                         throwable -> showMissingTask()));
     }
 
-    private void deleteTask() {
-        getSubscription().add(getViewModel().deleteTask()
+    private void deleteTask(@Nullable Integer taskId) {
+        mDisposable.add(mViewModel.deleteTask(taskId)
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
@@ -219,8 +224,8 @@ public class TaskDetailFragment extends Fragment {
                         __ -> showMissingTask()));
     }
 
-    private void editTask() {
-        getSubscription().add(getViewModel().editTask()
+    private void editTask(@Nullable Integer taskId) {
+        mDisposable.add(mViewModel.editTask(taskId)
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(  // onNext
@@ -245,16 +250,6 @@ public class TaskDetailFragment extends Fragment {
     private void showMissingTask() {
         mDetailTitle.setText("");
         mDetailDescription.setText(getString(R.string.no_data));
-    }
-
-    @NonNull
-    private TaskDetailViewModel getViewModel() {
-        return Preconditions.checkNotNull(mViewModel);
-    }
-
-    @NonNull
-    private CompositeDisposable getSubscription() {
-        return Preconditions.checkNotNull(mSubscription);
     }
 
     @Nullable

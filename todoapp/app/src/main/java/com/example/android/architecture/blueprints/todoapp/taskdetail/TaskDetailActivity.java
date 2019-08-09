@@ -20,17 +20,17 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.example.android.architecture.blueprints.todoapp.R;
+import com.example.android.architecture.blueprints.todoapp.base.view.BaseActivity;
 import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
 
 import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 
 /**
  * Displays task details screen.
  */
-public class TaskDetailActivity extends AppCompatActivity {
+public class TaskDetailActivity extends BaseActivity {
 
     public static final int REQUEST_EDIT_TASK = 1;
     public static final String EXTRA_TASK_ID = "TASK_ID";
