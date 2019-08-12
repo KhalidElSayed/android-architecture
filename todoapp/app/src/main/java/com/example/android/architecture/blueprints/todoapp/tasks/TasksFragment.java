@@ -31,6 +31,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.example.android.architecture.blueprints.todoapp.R;
+import com.example.android.architecture.blueprints.todoapp.base.view.BaseFragment;
+import com.example.android.architecture.blueprints.todoapp.base.viewmodel.ViewModelFactory;
 import com.example.android.architecture.blueprints.todoapp.data.model.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
@@ -38,11 +40,13 @@ import com.google.android.material.snackbar.Snackbar;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -51,11 +55,9 @@ import io.reactivex.schedulers.Schedulers;
 /**
  * Display a grid of {@link Task}s. User can choose to view all, active or completed tasks.
  */
-public class TasksFragment extends Fragment {
+public class TasksFragment extends BaseFragment {
 
     private static final String TAG = TasksFragment.class.getSimpleName();
-
-    private TasksViewModel mViewModel;
 
     private TasksAdapter mListAdapter;
 
@@ -71,7 +73,17 @@ public class TasksFragment extends Fragment {
 
     private TextView mFilteringLabelView;
 
-    private CompositeDisposable mSubscription = new CompositeDisposable();
+    @Inject
+    ViewModelFactory viewModelFactory;
+    @Nullable
+    private TasksViewModel mViewModel;
+
+    /**
+     * using a CompositeSubscription to gather all the subscriptions, so all of them can be
+     * later unsubscribed together
+     * */
+    @Inject
+    CompositeDisposable mDisposable;
 
     public TasksFragment() {
         // Requires empty public constructor
@@ -80,7 +92,6 @@ public class TasksFragment extends Fragment {
     public static TasksFragment newInstance() {
         return new TasksFragment();
     }
-
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -107,7 +118,7 @@ public class TasksFragment extends Fragment {
 
         setHasOptionsMenu(true);
 
-        mViewModel = TasksModule.createTasksViewModel(getActivity());
+        mViewModel = ViewModelProviders.of(this, viewModelFactory).get(TasksViewModel.class);
         mViewModel.restoreState(savedInstanceState);
 
         return root;
@@ -125,15 +136,39 @@ public class TasksFragment extends Fragment {
         super.onPause();
     }
 
-    private void bindViewModel() {
-        // using a CompositeSubscription to gather all the subscriptions, so all of them can be
-        // later unsubscribed together
-        mSubscription = new CompositeDisposable();
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putAll(mViewModel.getStateToSave());
+        super.onSaveInstanceState(outState);
+    }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_clear:
+                clearCompletedTasks();
+                break;
+            case R.id.menu_filter:
+                showFilteringPopUpMenu();
+                break;
+            case R.id.menu_refresh:
+                forceUpdate();
+                break;
+        }
+        return true;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.tasks_fragment_menu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    private void bindViewModel() {
         // The ViewModel holds an observable containing the state of the UI.
         // subscribe to the emissions of the Ui Model
         // update the view at every emission fo the Ui Model
-        mSubscription.add(mViewModel.getUiModel()
+        mDisposable.add(mViewModel.getUiModel()
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
@@ -145,7 +180,7 @@ public class TasksFragment extends Fragment {
 
         // subscribe to the emissions of the snackbar text
         // every time the snackbar text emits, show the snackbar
-        mSubscription.add(mViewModel.getSnackbarMessage()
+        mDisposable.add(mViewModel.getSnackbarMessage()
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
@@ -157,7 +192,7 @@ public class TasksFragment extends Fragment {
 
         // subscribe to the emissions of the loading indicator visibility
         // for every emission, update the visibility of the loading indicator
-        mSubscription.add(mViewModel.getLoadingIndicatorVisibility()
+        mDisposable.add(mViewModel.getLoadingIndicatorVisibility()
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
@@ -169,8 +204,8 @@ public class TasksFragment extends Fragment {
     }
 
     private void unbindViewModel() {
-        // unsubscribing from all the subscriptions to ensure we don't have any memory leaks
-        mSubscription.dispose();
+        // disposing from all the subscriptions to ensure we don't have any memory leaks
+        mDisposable.dispose();
     }
 
     private void updateView(TasksUiModel model) {
@@ -218,31 +253,8 @@ public class TasksFragment extends Fragment {
         fab.setOnClickListener(__ -> mViewModel.addNewTask());
     }
 
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        outState.putAll(mViewModel.getStateToSave());
-        super.onSaveInstanceState(outState);
-    }
-
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_clear:
-                clearCompletedTasks();
-                break;
-            case R.id.menu_filter:
-                showFilteringPopUpMenu();
-                break;
-            case R.id.menu_refresh:
-                forceUpdate();
-                break;
-        }
-        return true;
-    }
-
     private void clearCompletedTasks() {
-        mSubscription.add(mViewModel.clearCompletedTasks()
+        mDisposable.add(mViewModel.clearCompletedTasks()
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
@@ -256,7 +268,7 @@ public class TasksFragment extends Fragment {
     }
 
     private void forceUpdate() {
-        mSubscription.add(mViewModel.forceUpdateTasks()
+        mDisposable.add(mViewModel.forceUpdateTasks()
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
@@ -267,12 +279,6 @@ public class TasksFragment extends Fragment {
                         //onError
                         error -> Log.d(TAG, "Error refreshing tasks", error)
                 ));
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.tasks_fragment_menu, menu);
-        super.onCreateOptionsMenu(menu, inflater);
     }
 
     private void showFilteringPopUpMenu() {
@@ -314,7 +320,6 @@ public class TasksFragment extends Fragment {
         mNoTaskMainView.setText(model.getText());
         mNoTaskIcon.setImageResource(model.getIcon());
         mNoTaskAddView.setVisibility(model.isAddNewTaskVisible() ? View.VISIBLE : View.GONE);
-
     }
 
     private void setFilterLabel(@StringRes int text) {

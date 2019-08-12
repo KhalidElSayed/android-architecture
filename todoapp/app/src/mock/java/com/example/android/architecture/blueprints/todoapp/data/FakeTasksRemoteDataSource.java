@@ -22,6 +22,7 @@ import androidx.annotation.VisibleForTesting;
 
 import com.example.android.architecture.blueprints.todoapp.data.model.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
+import com.example.android.architecture.blueprints.todoapp.data.source.remote.TasksRemoteDataSource;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -36,13 +37,14 @@ import io.reactivex.Single;
 /**
  * Implementation of a remote data source with static access to the data for easy testing.
  */
-public class FakeTasksRemoteDataSource implements TasksDataSource {
+public class FakeTasksRemoteDataSource extends TasksRemoteDataSource implements TasksDataSource {
 
     private static final Map<Integer, Task> TASKS_SERVICE_DATA = new LinkedHashMap<>();
     private static FakeTasksRemoteDataSource INSTANCE;
 
     // Prevent direct instantiation.
     private FakeTasksRemoteDataSource() {
+        super();
     }
 
     public static FakeTasksRemoteDataSource getInstance() {

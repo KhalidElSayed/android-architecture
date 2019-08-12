@@ -7,19 +7,20 @@ import android.util.Pair;
 
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
+import com.example.android.architecture.blueprints.todoapp.base.viewmodel.BaseViewModel;
 import com.example.android.architecture.blueprints.todoapp.data.model.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.example.android.architecture.blueprints.todoapp.util.schedulers.BaseSchedulerProvider;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.annotation.VisibleForTesting;
-import androidx.lifecycle.ViewModel;
-
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.subjects.BehaviorSubject;
@@ -30,7 +31,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * ViewModel for the list of tasks.
  */
-public final class TasksViewModel extends ViewModel {
+public final class TasksViewModel extends BaseViewModel {
 
     @VisibleForTesting
     static final String FILTER_KEY = "filter";
@@ -45,20 +46,27 @@ public final class TasksViewModel extends ViewModel {
     @NonNull
     private final BaseSchedulerProvider mSchedulerProvider;
 
-    // using a BehaviourSubject because we are interested in the last object that was emitted before
-    // subscribing. Like this we ensure that the loading indicator has the correct visibility.
+    /**
+     * using a BehaviourSubject because we are interested in the last object that was emitted before
+     * subscribing. Like this we ensure that the loading indicator has the correct visibility.
+     * */
     private final BehaviorSubject<Boolean> mLoadingIndicatorSubject;
 
-    // using a BehaviourSubject because we are interested in the last object that was emitted before
-    // subscribing. Like this we ensure that the last selected filter or the default one is used.
+    /**
+     * using a BehaviourSubject because we are interested in the last object that was emitted before
+     * subscribing. Like this we ensure that the last selected filter or the default one is used.
+     * */
     @NonNull
     private final BehaviorSubject<TasksFilterType> mFilter;
 
-    // using a PublishSubject because we are not interested in the last object that was emitted
-    // before subscribing. Like this we avoid displaying the snackbar multiple times
+    /**
+     * using a PublishSubject because we are not interested in the last object that was emitted
+     * before subscribing. Like this we avoid displaying the snackbar multiple times
+     * */
     @NonNull
     private final PublishSubject<Integer> mSnackbarText;
 
+    @Inject
     public TasksViewModel(@NonNull TasksRepository tasksRepository,
                           @NonNull TasksNavigator navigationProvider,
                           @NonNull BaseSchedulerProvider schedulerProvider) {
@@ -171,8 +179,8 @@ public final class TasksViewModel extends ViewModel {
      * Trigger a force update of the tasks.
      */
     public Completable forceUpdateTasks() {
-        mLoadingIndicatorSubject.onNext(true);
         return mTasksRepository.refreshTasks()
+                .doOnSubscribe(disposable -> mLoadingIndicatorSubject.onNext(true))
                 .doOnTerminate(() -> mLoadingIndicatorSubject.onNext(false));
     }
 

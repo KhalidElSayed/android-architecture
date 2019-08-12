@@ -18,12 +18,10 @@ package com.example.android.architecture.blueprints.todoapp.tasks;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.base.view.BaseActivity;
-import com.example.android.architecture.blueprints.todoapp.data.source.remote.TodoApi;
 import com.example.android.architecture.blueprints.todoapp.statistics.StatisticsActivity;
 import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
 import com.example.android.architecture.blueprints.todoapp.util.EspressoIdlingResource;
@@ -31,28 +29,15 @@ import com.google.android.material.navigation.NavigationView;
 
 import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.test.espresso.IdlingResource;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-
-import timber.log.Timber;
-
 public class TasksActivity extends BaseActivity {
 
     private DrawerLayout mDrawerLayout;
-
-    @Inject
-    @Named("todoApi")
-    TodoApi todoApi;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,13 +50,6 @@ public class TasksActivity extends BaseActivity {
         ActionBar ab = getSupportActionBar();
         ab.setHomeAsUpIndicator(R.drawable.ic_menu);
         ab.setDisplayHomeAsUpEnabled(true);
-
-        Map<String, String> params = new HashMap<>(2);
-        params.put("loginName", "555e4");
-        params.put("password", "123456");
-
-        todoApi.authenticateUser(params)
-                .subscribe(jsonObject -> Log.e("testRetroAuth", jsonObject.toString()));
 
         // Set up the navigation drawer.
         mDrawerLayout = findViewById(R.id.drawer_layout);

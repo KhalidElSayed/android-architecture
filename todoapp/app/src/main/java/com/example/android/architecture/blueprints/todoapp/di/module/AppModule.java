@@ -13,10 +13,12 @@ import dagger.Module;
 import dagger.Provides;
 
 @Module
-public abstract class AppModule {
+public class AppModule {
 
-  @Binds
-  abstract Context bindContext(ToDoApplication application);
+  @Provides
+  Context bindContext(ToDoApplication application) {
+    return application;
+  }
 
   @Provides
   @Singleton

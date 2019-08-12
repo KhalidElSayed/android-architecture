@@ -72,7 +72,7 @@ public class TaskDetailFragment extends BaseFragment {
      * later unsubscribed together
      * */
     @Inject
-    private CompositeDisposable mDisposable;
+    CompositeDisposable mDisposable;
 
     public static TaskDetailFragment newInstance(@Nullable String taskId) {
         Bundle arguments = new Bundle();

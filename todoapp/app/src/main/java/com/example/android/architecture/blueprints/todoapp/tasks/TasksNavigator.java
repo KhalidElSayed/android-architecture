@@ -21,6 +21,9 @@ import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTa
 import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailActivity;
 import com.example.android.architecture.blueprints.todoapp.util.providers.BaseNavigator;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import androidx.annotation.NonNull;
 
 /**
@@ -31,7 +34,8 @@ public class TasksNavigator {
     @NonNull
     private final BaseNavigator mNavigationProvider;
 
-    public TasksNavigator(@NonNull BaseNavigator mNavigationProvider) {
+    @Inject
+    public TasksNavigator(@NonNull @Named("tasksNavigationProvider") BaseNavigator mNavigationProvider) {
         this.mNavigationProvider = mNavigationProvider;
     }
 

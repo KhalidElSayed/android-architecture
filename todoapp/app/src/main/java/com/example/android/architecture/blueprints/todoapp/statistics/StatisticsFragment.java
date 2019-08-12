@@ -55,7 +55,7 @@ public class StatisticsFragment extends BaseFragment {
      * so all of them can be later unsubscribed together
      * */
     @Inject
-    private CompositeDisposable mDisposable;
+    CompositeDisposable mDisposable;
 
     public static StatisticsFragment newInstance() {
         return new StatisticsFragment();
