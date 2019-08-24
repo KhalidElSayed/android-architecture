@@ -3,7 +3,6 @@ package com.example.android.architecture.blueprints.todoapp.tasks;
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
-import android.util.Pair;
 
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
@@ -21,6 +20,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.annotation.VisibleForTesting;
+import androidx.core.util.Pair;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.subjects.BehaviorSubject;

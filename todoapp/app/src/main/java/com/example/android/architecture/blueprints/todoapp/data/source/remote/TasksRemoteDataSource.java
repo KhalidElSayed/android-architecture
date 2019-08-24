@@ -20,70 +20,48 @@ package com.example.android.architecture.blueprints.todoapp.data.source.remote;
 import com.example.android.architecture.blueprints.todoapp.data.model.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
 
-import java.util.Iterator;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import androidx.annotation.NonNull;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
- * Implementation of the data source that adds a latency simulating network.
+ * Concrete implementation of a data source as a network.
  */
+@Singleton
 public class TasksRemoteDataSource implements TasksDataSource {
 
-    private static TasksRemoteDataSource INSTANCE;
+    TodoApi todoApi;
 
-    private static final int SERVICE_LATENCY_IN_MILLIS = 5000;
-
-    private final static Map<Integer, Task> TASKS_SERVICE_DATA;
-
-    static {
-        TASKS_SERVICE_DATA = new LinkedHashMap<>(2);
-        addTask("Build tower in Pisa", "Ground looks good, no foundation work required.");
-        addTask("Finish bridge in Tacoma", "Found awesome girders at half the cost!");
-    }
-
-    public static TasksRemoteDataSource getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new TasksRemoteDataSource();
-        }
-        return INSTANCE;
-    }
-
-    // Prevent direct instantiation.
-    public TasksRemoteDataSource() {
-    }
-
-    private static void addTask(String title, String description) {
-        Task newTask = new Task(title, description);
-        TASKS_SERVICE_DATA.put(newTask.getId(), newTask);
+    @Inject
+    public TasksRemoteDataSource(@Named("todoApi") TodoApi api) {
+        this.todoApi = api;
     }
 
     @Override
     public Single<List<Task>> getTasks() {
-        return Observable.fromIterable(TASKS_SERVICE_DATA.values())
-                .delay(SERVICE_LATENCY_IN_MILLIS, TimeUnit.MILLISECONDS)
-                .toList();
+        return todoApi.getTasks();
     }
 
     @Override
     public Observable<Task> getTask(@NonNull Integer taskId) {
-        final Task task = TASKS_SERVICE_DATA.get(taskId);
-        if (task != null) {
-            return Observable.just(task).delay(SERVICE_LATENCY_IN_MILLIS, TimeUnit.MILLISECONDS);
-        } else {
-            return Observable.empty();
-        }
+        return todoApi.getTask(taskId).toObservable();
     }
 
     @Override
     public Completable saveTask(@NonNull Task task) {
-        return Completable.fromAction(() -> TASKS_SERVICE_DATA.put(task.getId(), task));
+        checkNotNull(task);
+        return todoApi.addTask(task);
     }
 
     @Override
@@ -95,47 +73,33 @@ public class TasksRemoteDataSource implements TasksDataSource {
 
     @Override
     public Completable completeTask(@NonNull Task task) {
-        return Completable.fromAction(() -> {
-            Task completedTask = new Task(task.getTitle(), task.getDescription(), task.getId(), true);
-            TASKS_SERVICE_DATA.put(task.getId(), completedTask);
-        });
+        checkNotNull(task);
+        return completeTask(task.getId());
     }
 
     @Override
     public Completable completeTask(@NonNull Integer taskId) {
-        return Completable.fromAction(() -> {
-            Task task = TASKS_SERVICE_DATA.get(taskId);
-            task = new Task(task.getTitle(), task.getDescription(), taskId, true);
-            TASKS_SERVICE_DATA.put(task.getId(), task);
-        });
+        Map<String, Integer> isCompleted = new HashMap<>(1);
+        isCompleted.put("isCompleted", 1);
+        return todoApi.updateTask(taskId, isCompleted);
     }
 
     @Override
     public Completable activateTask(@NonNull Task task) {
-        return Completable.fromAction(() -> {
-            Task activeTask = new Task(task.getTitle(), task.getDescription(), task.getId());
-            TASKS_SERVICE_DATA.put(task.getId(), activeTask);
-        });
+        checkNotNull(task);
+        return activateTask(task.getId());
     }
 
     @Override
     public Completable activateTask(@NonNull Integer taskId) {
-        return Completable.fromAction(() -> {
-            Task task = TASKS_SERVICE_DATA.get(taskId);
-            task = new Task(task.getTitle(), task.getDescription(), taskId, false);
-            TASKS_SERVICE_DATA.put(task.getId(), task);
-        });
+        Map<String, Integer> isCompleted = new HashMap<>(1);
+        isCompleted.put("isCompleted", 0);
+        return todoApi.updateTask(taskId, isCompleted);
     }
 
     @Override
-    public void clearCompletedTasks() {
-        Iterator<Map.Entry<Integer, Task>> it = TASKS_SERVICE_DATA.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry<Integer, Task> entry = it.next();
-            if (entry.getValue().isCompleted()) {
-                it.remove();
-            }
-        }
+    public Completable clearCompletedTasks() {
+        return todoApi.deleteCompletedTasks();
     }
 
     @Override
@@ -147,11 +111,11 @@ public class TasksRemoteDataSource implements TasksDataSource {
 
     @Override
     public Completable deleteTask(@NonNull Integer taskId) {
-        return Completable.fromCallable(() -> TASKS_SERVICE_DATA.remove(taskId));
+        return todoApi.deleteTask(taskId);
     }
 
     @Override
     public Completable deleteAllTasks() {
-        return Completable.fromAction(TASKS_SERVICE_DATA::clear);
+        return todoApi.deleteTasks();
     }
 }

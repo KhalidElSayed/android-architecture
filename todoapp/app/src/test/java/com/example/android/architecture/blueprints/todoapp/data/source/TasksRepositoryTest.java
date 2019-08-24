@@ -19,10 +19,11 @@ package com.example.android.architecture.blueprints.todoapp.data.source;
 import android.content.Context;
 
 import com.example.android.architecture.blueprints.todoapp.data.model.Task;
+import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksLocalDataSource;
+import com.example.android.architecture.blueprints.todoapp.data.source.remote.TasksRemoteDataSource;
 import com.example.android.architecture.blueprints.todoapp.util.schedulers.ImmediateSchedulerProvider;
 import com.google.common.collect.Lists;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -33,6 +34,7 @@ import java.util.List;
 
 import io.reactivex.Completable;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import io.reactivex.observers.TestObserver;
 
 import static org.mockito.Matchers.eq;
@@ -46,22 +48,22 @@ public class TasksRepositoryTest {
 
     private final static String TASK_TITLE = "title";
 
-    private static List<Task> TASKS = Lists.newArrayList(new Task("Title1", "Description1"),
-            new Task("Title2", "Description2"));
+    private static List<Task> TASKS = Lists.newArrayList(new Task("Title1", "Description1", 1),
+            new Task("Title2", "Description2", 2));
 
-    private final static Task ACTIVE_TASK = new Task(TASK_TITLE, "Some Task Description");
+    private final static Task ACTIVE_TASK = new Task(TASK_TITLE, "Some Task Description", 10);
 
-    private final static Task COMPLETED_TASK = new Task(TASK_TITLE, "Some Task Description", true);
+    private final static Task COMPLETED_TASK = new Task(TASK_TITLE, "Some Task Description", 20, true);
 
     private TasksRepository mTasksRepository;
 
     private TestObserver<List<Task>> mTasksTestSubscriber;
 
     @Mock
-    private TasksDataSource mTasksRemoteDataSource;
+    private TasksRemoteDataSource mTasksRemoteDataSource;
 
     @Mock
-    private TasksDataSource mTasksLocalDataSource;
+    private TasksLocalDataSource mTasksLocalDataSource;
 
     @Mock
     private Context mContext;
@@ -75,15 +77,10 @@ public class TasksRepositoryTest {
         MockitoAnnotations.initMocks(this);
 
         // Get a reference to the class under test
-        mTasksRepository = TasksRepository.getInstance(
+        mTasksRepository = new TasksRepository(
                 mTasksRemoteDataSource, mTasksLocalDataSource, new ImmediateSchedulerProvider());
 
         mTasksTestSubscriber = new TestObserver<>();
-    }
-
-    @After
-    public void destroyRepositoryInstance() {
-        TasksRepository.destroyInstance();
     }
 
     @Test
@@ -229,6 +226,7 @@ public class TasksRepositoryTest {
 
     @Test
     public void getTask_whenDataNotLocal_fails() {
+        // TODO: check the building of this test case again.
         // Given a stub completed task not available in the local repository
         new ArrangeBuilder()
                 .withTaskNotAvailable(mTasksLocalDataSource, COMPLETED_TASK.getId());
@@ -238,13 +236,19 @@ public class TasksRepositoryTest {
                 .subscribe(mTestSubscriber);
 
         // Verify null is returned
-        mTestSubscriber.assertValue(null);
+//        mTestSubscriber.assertValue(null);
+        mTestSubscriber.assertNoValues();
     }
 
     @Test
     public void clearCompletedTasks_deletesTasksFromRemoteDataSource() {
+        // Given that all completed tasks are cleared from the tasks repository
+        new ArrangeBuilder()
+                .withCompletedTaskCleared(mTasksRemoteDataSource)
+                .withCompletedTaskCleared(mTasksLocalDataSource);
+
         // When all completed tasks are cleared from the tasks repository
-        mTasksRepository.clearCompletedTasks();
+        mTasksRepository.clearCompletedTasks().subscribe();
 
         // Verify that tasks are cleared from remote
         verify(mTasksRemoteDataSource).clearCompletedTasks();
@@ -252,8 +256,13 @@ public class TasksRepositoryTest {
 
     @Test
     public void clearCompletedTasks_deletesTasksFromLocalDataSource() {
+        // Given that all completed tasks are cleared from the tasks repository
+        new ArrangeBuilder()
+                .withCompletedTaskCleared(mTasksRemoteDataSource)
+                .withCompletedTaskCleared(mTasksLocalDataSource);
+
         // When all completed tasks are cleared from the tasks repository
-        mTasksRepository.clearCompletedTasks();
+        mTasksRepository.clearCompletedTasks().subscribe();
 
         // Verify that tasks are cleared from local
         verify(mTasksLocalDataSource).clearCompletedTasks();
@@ -261,7 +270,12 @@ public class TasksRepositoryTest {
 
     @Test
     public void deleteAllTasks_deletesTasksFromRemoteDataSource() {
-        // When all tasks are deleted to the tasks repository
+        // Given that all tasks are deleted from the tasks repository
+        new ArrangeBuilder()
+                .withDeleteAllTasks(mTasksRemoteDataSource)
+                .withDeleteAllTasks(mTasksLocalDataSource);
+
+        // When all tasks are deleted from the tasks repository
         mTasksRepository.deleteAllTasks();
 
         // Verify that tasks deleted from remote
@@ -270,8 +284,13 @@ public class TasksRepositoryTest {
 
     @Test
     public void deleteAllTasks_deletesTasksFromLocalDataSource() {
+        // Given that all tasks are deleted from the tasks repository
+        new ArrangeBuilder()
+                .withDeleteAllTasks(mTasksRemoteDataSource)
+                .withDeleteAllTasks(mTasksLocalDataSource);
+
         // When all tasks are deleted to the tasks repository
-        mTasksRepository.deleteAllTasks();
+        mTasksRepository.deleteAllTasks().subscribe();
 
         // Verify that tasks deleted from local
         verify(mTasksLocalDataSource).deleteAllTasks();
@@ -279,8 +298,13 @@ public class TasksRepositoryTest {
 
     @Test
     public void deleteTask_deletesTaskFromRemoteDataSource() {
+        // Given that a task is deleted from the tasks repository
+        new ArrangeBuilder()
+                .withDeleteTask(mTasksRemoteDataSource, COMPLETED_TASK.getId())
+                .withDeleteTask(mTasksLocalDataSource, COMPLETED_TASK.getId());
+
         // When task deleted
-        mTasksRepository.deleteTask(COMPLETED_TASK.getId());
+        mTasksRepository.deleteTask(COMPLETED_TASK.getId()).subscribe();
 
         // Verify that the task was deleted from remote
         verify(mTasksRemoteDataSource).deleteTask(COMPLETED_TASK.getId());
@@ -288,8 +312,13 @@ public class TasksRepositoryTest {
 
     @Test
     public void deleteTask_deletesTaskFromLocalDataSource() {
+        // Given that a task is deleted from the tasks repository
+        new ArrangeBuilder()
+                .withDeleteTask(mTasksRemoteDataSource, COMPLETED_TASK.getId())
+                .withDeleteTask(mTasksLocalDataSource, COMPLETED_TASK.getId());
+
         // When task deleted
-        mTasksRepository.deleteTask(COMPLETED_TASK.getId());
+        mTasksRepository.deleteTask(COMPLETED_TASK.getId()).subscribe();
 
         // Verify that the task was deleted from local
         verify(mTasksLocalDataSource).deleteTask(COMPLETED_TASK.getId());
@@ -315,18 +344,19 @@ public class TasksRepositoryTest {
     class ArrangeBuilder {
 
         ArrangeBuilder withTasksNotAvailable(TasksDataSource dataSource) {
-            when(dataSource.getTasks()).thenReturn(Observable.just(Collections.emptyList()));
+            when(dataSource.getTasks()).thenReturn(Single.just(Collections.emptyList()));
             return this;
         }
 
         ArrangeBuilder withTasksAvailable(TasksDataSource dataSource, List<Task> tasks) {
             // don't allow the data sources to complete.
-            when(dataSource.getTasks()).thenReturn(Observable.just(tasks));
+            when(dataSource.getTasks()).thenReturn(Single.just(tasks));
             return this;
         }
 
-        ArrangeBuilder withTaskNotAvailable(TasksDataSource dataSource, String taskId) {
-            when(dataSource.getTask(eq(taskId))).thenReturn(Observable.<Task>just(null).concatWith(Observable.never()));
+        ArrangeBuilder withTaskNotAvailable(TasksDataSource dataSource, int taskId) {
+//            when(dataSource.getTask(eq(taskId))).thenReturn(Observable.<Task>just(null).concatWith(Observable.never()));
+            when(dataSource.getTask(eq(taskId))).thenReturn(Observable.never());
             return this;
         }
 
@@ -340,7 +370,7 @@ public class TasksRepositoryTest {
             return this;
         }
 
-        ArrangeBuilder withActivatedTaskId(TasksDataSource dataSource, String taskId) {
+        ArrangeBuilder withActivatedTaskId(TasksDataSource dataSource, int taskId) {
             when(dataSource.activateTask(taskId)).thenReturn(Completable.complete());
             return this;
         }
@@ -350,7 +380,7 @@ public class TasksRepositoryTest {
             return this;
         }
 
-        ArrangeBuilder withCompletedTaskId(TasksDataSource dataSource, String taskId) {
+        ArrangeBuilder withCompletedTaskId(TasksDataSource dataSource, int taskId) {
             when(dataSource.completeTask(taskId)).thenReturn(Completable.complete());
             return this;
         }
@@ -369,6 +399,21 @@ public class TasksRepositoryTest {
 
         ArrangeBuilder withTasksSaved(TasksDataSource dataSource, List<Task> tasks) {
             when(dataSource.saveTasks(tasks)).thenReturn(Completable.complete());
+            return this;
+        }
+
+        ArrangeBuilder withCompletedTaskCleared(TasksDataSource dataSource) {
+            when(dataSource.clearCompletedTasks()).thenReturn(Completable.complete());
+            return this;
+        }
+
+        ArrangeBuilder withDeleteTask(TasksDataSource dataSource, int taskId) {
+            when(dataSource.deleteTask(taskId)).thenReturn(Completable.complete());
+            return this;
+        }
+
+        ArrangeBuilder withDeleteAllTasks(TasksDataSource dataSource) {
+            when(dataSource.deleteAllTasks()).thenReturn(Completable.complete());
             return this;
         }
     }

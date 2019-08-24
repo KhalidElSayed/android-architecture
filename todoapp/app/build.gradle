@@ -44,12 +44,11 @@ android {
 
     buildTypes {
         def BASE_URL = "BASE_URL"
-        def BASE_FILES_URL = "BASE_FILES_URL"
 
         def configAny = { k -> "\"${project.properties.get(k)}\"" }
-        def config = { p,k -> "\"${project.properties.get(p+'.'+k)}\"" }
-        def configDebug = { k -> config('dev',k) }
-        def configRelease = { k -> config('release',k) }
+        def config = { p, k -> "\"${project.properties.get(p + '.' + k)}\"" }
+        def configDebug = { k -> config('dev', k) }
+        def configRelease = { k -> config('release', k) }
 
         debug {
             // Minifying the variant used for tests is not supported when using Jack.
@@ -63,8 +62,7 @@ android {
             debuggable true
             testCoverageEnabled !project.hasProperty('android.injected.invoked.from.ide')
 
-//            buildConfigField "String", BASE_URL, configDebug("baseUrl")
-//            buildConfigField "String", BASE_FILES_URL, configDebug("baseFilesUrl")
+            buildConfigField "String", BASE_URL, configDebug("baseUrl")
         }
 
         release {
@@ -76,6 +74,8 @@ android {
             debuggable false
 
 //            signingConfig signingConfigs.release
+
+//            buildConfigField "String", BASE_URL, configRelease("baseUrl")
         }
     }
 
@@ -100,7 +100,7 @@ android {
 
     // Remove mockRelease as it's not needed.
     android.variantFilter { variant ->
-        if(variant.buildType.name.equals('release')
+        if (variant.buildType.name.equals('release')
                 && variant.getFlavors().get(0).name.equals('mock')) {
             variant.setIgnore(true)
         }
@@ -167,9 +167,6 @@ dependencies {
 
     // Guava
     implementation deps.guava
-
-    // Sqlbrite 2
-//    implementation deps.sqlbrite
 
     // Tray (SharedPreference) Lib
     implementation deps.tray

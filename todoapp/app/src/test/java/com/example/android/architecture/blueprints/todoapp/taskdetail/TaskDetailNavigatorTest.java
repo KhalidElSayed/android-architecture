@@ -43,7 +43,8 @@ public class TaskDetailNavigatorTest {
     @Test
     public void onStartEditTask_startsActivity() throws Exception {
         // Given a task id
-        String taskId = "id";
+//        String taskId = "id";
+        int taskId = 1;
 
         // When starting to edit the task
         mNavigator.onStartEditTask(taskId);

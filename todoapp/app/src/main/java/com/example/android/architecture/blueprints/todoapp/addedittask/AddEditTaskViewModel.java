@@ -35,14 +35,11 @@ public class AddEditTaskViewModel extends BaseViewModel {
     @NonNull
     private final PublishSubject<Integer> mSnackbarText;
 
-    /*@Nullable
-    private Integer mTaskId;*/
-
-    /*@Nullable
+    @Nullable
     private String mRestoredTitle;
 
     @Nullable
-    private String mRestoredDescription;*/
+    private String mRestoredDescription;
 
     @Inject
     public AddEditTaskViewModel(@NonNull TasksRepository tasksRepository,
@@ -66,7 +63,7 @@ public class AddEditTaskViewModel extends BaseViewModel {
      */
     @NonNull
     public Observable<AddEditTaskUiModel> getUiModel(@Nullable Integer taskId) {
-//        if (Strings.isNullOrEmpty(mTaskId)) {
+//        if (Strings.isNullOrEmpty(taskId)) {
         if (taskId == null) {
             // new task. nothing to do here.
             return Observable.empty();
@@ -84,14 +81,14 @@ public class AddEditTaskViewModel extends BaseViewModel {
      * @param title       the restored title.
      * @param description the restored description.
      */
-    /*public void setRestoredState(@Nullable String title, @Nullable String description) {
+    public void setRestoredState(@Nullable String title, @Nullable String description) {
         mRestoredTitle = title;
         mRestoredDescription = description;
-    }*/
+    }
 
     private Task restoreTask(Task task) {
-        String title = /*mRestoredTitle != null ? mRestoredTitle :*/ task.getTitle();
-        String description = /*mRestoredDescription != null ? mRestoredDescription :*/ task.getDescription();
+        String title = mRestoredTitle != null ? mRestoredTitle : task.getTitle();
+        String description = mRestoredDescription != null ? mRestoredDescription : task.getDescription();
 
         return new Task(title, description, task.getId());
     }
@@ -116,14 +113,14 @@ public class AddEditTaskViewModel extends BaseViewModel {
         Task newTask;
         if (isNewTask(taskId)) {
             newTask = new Task(title, description);
-            // TODO: this check should be moved to the view (activity)
+            // TODO: this check should be moved to the view (activity) <= this will be applied in simple version
             if (newTask.isEmpty()) {
                 showSnackbar(R.string.empty_task_message);
                 return Completable.complete();
             }
         } else {
-            // TODO: this behaviour will be moved to the view (activity)
-            newTask = new Task(title, description/*, mTaskId*/);
+            // TODO: this behaviour will be moved to the view (activity) <= this will be applied in simple version
+            newTask = new Task(title, description, taskId);
         }
         return mTasksRepository.saveTask(newTask);
     }

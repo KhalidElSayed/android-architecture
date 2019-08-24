@@ -1,5 +1,6 @@
 package com.example.android.architecture.blueprints.todoapp.di.module;
 
+import com.example.android.architecture.blueprints.todoapp.BuildConfig;
 import com.example.android.architecture.blueprints.todoapp.data.source.remote.TodoApi;
 import com.example.android.architecture.blueprints.todoapp.data.source.remote.helper.ApiAuthenticator;
 import com.example.android.architecture.blueprints.todoapp.data.source.remote.helper.ApiHelper;
@@ -24,16 +25,8 @@ public class ApiModule {
   @Provides
   @Singleton
   @BaseUrl
-//  @Named("BaseUrl")
   String provideBaseUrl() {
-        /*if(BuildConfig.DEBUG) {
-      return "http://10.3.20.23:83/api/";
-    } else {
-      return "http://192.168.50.15:83/api/";
-    }*/
-
-//        return "http://www.amock.io/api/";
-    return "https://user.nagwa.com/user/";
+    return BuildConfig.BASE_URL;
   }
 
   @Provides
@@ -77,16 +70,4 @@ public class ApiModule {
   TodoApi provideTodoApi(@BaseUrl String baseUrl, ApiHelper apiHelper) {
     return apiHelper.getAPI(baseUrl, TodoApi.class);
   }
-
-  /*@Provides
-  @Singleton
-  Retrofit provideRetrofit(@Named("BaseUrl") String baseUrl, @Named("apiGson") Gson gson, OkHttpClient okHttpClient) {
-    Retrofit retrofit = new Retrofit.Builder()
-            .baseUrl(baseUrl)
-            .client(okHttpClient)
-            .addConverterFactory(GsonConverterFactory.create(gson))
-            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-            .build();
-    return retrofit;
-  }*/
 }

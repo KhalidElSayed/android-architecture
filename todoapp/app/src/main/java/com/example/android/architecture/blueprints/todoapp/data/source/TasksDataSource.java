@@ -53,7 +53,7 @@ public interface TasksDataSource {
 
     Completable activateTask(@NonNull Integer taskId);
 
-    void clearCompletedTasks();
+    Completable clearCompletedTasks();
 
     @NonNull
     Completable refreshTasks();

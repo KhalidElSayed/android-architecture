@@ -30,8 +30,8 @@ public class StatisticsViewModelTest {
 
     private static final String NO_TASKS = "no tasks";
 
-    private static final String LOADING = "loading";
-    private static final String LOADING_ERROR = "loading error";
+    private static final String LOADING = "LOADING";
+    private static final String LOADING_ERROR = "Error while loading tasks";
 
     private List<Task> mTasks;
 
@@ -46,7 +46,7 @@ public class StatisticsViewModelTest {
     private TestObserver<StatisticsUiModel> mTestSubscriber;
 
     @Before
-    public void setupStatisticsPresenter() {
+    public void setupStatisticsViewModel() {
         // Mockito has a very convenient way to inject mocks by using the @Mock annotation. To
         // inject the mocks in the test the initMocks method needs to be called.
         MockitoAnnotations.initMocks(this);
@@ -56,9 +56,9 @@ public class StatisticsViewModelTest {
 
         // We subscribe the tasks to 3, with one active and two completed
         mTasks = Lists.newArrayList(
-                new Task("Title1", "Description1"),
-                new Task("Title2", "Description2", true),
-                new Task("Title3", "Description3", true));
+                new Task("Title1", "Description1", 1),
+                new Task("Title2", "Description2", 2, true),
+                new Task("Title3", "Description3", 3, true));
         mTestSubscriber = new TestObserver<>();
     }
 
@@ -83,12 +83,15 @@ public class StatisticsViewModelTest {
         //Given a list of tasks in the repository
         when(mTasksRepository.refreshTasks()).thenReturn(Completable.complete());
         when(mTasksRepository.getTasks()).thenReturn(Single.just(mTasks));
+        //Given the required resource
+        withText(R.string.loading, LOADING);
+        withText(R.string.loading_tasks_error, LOADING_ERROR);
 
         //When subscribing to the statistics stream
         mViewModel.getUiModel().subscribe();
 
         //The correct pair is returned
-        verify(mResourceProvider).getString(R.string.statistics_active_completed_tasks, 1, 2);
+        verify(mResourceProvider).getString(R.string.statistics_active_completed_tasks, 1L, 2L);
     }
 
     @Test
@@ -98,6 +101,8 @@ public class StatisticsViewModelTest {
         when(mTasksRepository.getTasks()).thenReturn(Single.just(new ArrayList<>()));
         // And string resources
         withText(R.string.statistics_no_tasks, NO_TASKS);
+        withText(R.string.loading, LOADING);
+        withText(R.string.loading_tasks_error, LOADING_ERROR);
 
         //When subscribing to the statistics stream
         mViewModel.getUiModel().subscribe(mTestSubscriber);
@@ -114,6 +119,7 @@ public class StatisticsViewModelTest {
         when(mTasksRepository.getTasks()).thenReturn(Single.error(new Exception()));
         // And a string to be returned for loading error
         withText(R.string.loading_tasks_error, LOADING_ERROR);
+        withText(R.string.loading, LOADING);
 
         //When subscribing to the statistics stream
         mViewModel.getUiModel().subscribe(mTestSubscriber);

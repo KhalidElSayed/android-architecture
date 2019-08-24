@@ -9,28 +9,57 @@ import com.google.gson.JsonObject;
 import java.util.List;
 import java.util.Map;
 
+import io.reactivex.Completable;
 import io.reactivex.Single;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
-import retrofit2.http.Headers;
+import retrofit2.http.PATCH;
 import retrofit2.http.POST;
+import retrofit2.http.Path;
 
-@Authentication(url = "https://auth.nagwa.com/connect/token",
+@Authentication(url = "http://auth-todoapp.mocklab.io/connect/token",
                 fields = {"grant_type: client_credentials",
+                  "scope: UserManagementApi",
                   "client_id: mobile.to.usermanagement",
-                  "client_secret: Gynx2zMbrTsR27AfwyDMETFZF7xWhQRxGNn7yv5f",
-                  "scope: UserManagementApi"})
+                  "client_secret: FrHT23xsWrTsDfbb574EZF7xWhQRcydAGF34C"})
 public interface TodoApi {
 
   @AuthScope(scope = TodoApi.class)
-  @Headers("api-version: 2")
-  @POST("PortalsLogin")
-  Single<JsonObject> authenticateUser(@Body Map<String, String> params);
+  @POST(LOGIN_URL)
+  Single<JsonObject> login(@Body Map<String, String> params);
 
   @NoAuth
   @GET(TASKS_URL)
   Single<List<Task>> getTasks();
 
+  @NoAuth
+  @GET(TASK_URL)
+  Single<Task> getTask(@Path("id") int id);
+
+  @NoAuth
+  @POST(TASKS_URL)
+  Completable addTask(@Body Task task);
+
+  @NoAuth
+  @PATCH(TASK_URL)
+  Completable updateTask(@Path("id") int id, @Body Map<String, Integer> isCompleted);
+
+  @NoAuth
+  @DELETE(DELETE_COMPLETED_TASKS_URL)
+  Completable deleteCompletedTasks();
+
+  @NoAuth
+  @DELETE(TASK_URL)
+  Completable deleteTask(@Path("id") int id);
+
+  @NoAuth
+  @DELETE(TASKS_URL)
+  Completable deleteTasks();
+
   // ---------------- Endpoints URLs -------------------//
+  String LOGIN_URL = "login";
   String TASKS_URL = "tasks";
+  String TASK_URL = "tasks/{id}";
+  String DELETE_COMPLETED_TASKS_URL = "tasks?clearCompleted=true";
 }

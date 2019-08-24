@@ -45,7 +45,7 @@ public class TasksNavigatorTest {
     @Test
     public void openTaskDetails_startsActivity() {
         // Given a task id
-        String taskId = "id";
+        int taskId = 1;
 
         // When opening the task details
         mTasksNavigator.openTaskDetails(taskId);

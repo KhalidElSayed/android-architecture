@@ -14,67 +14,77 @@
  * limitations under the License.
  */
 
-package com.example.android.architecture.blueprints.todoapp.data;
+package com.example.android.architecture.blueprints.todoapp.data.source.remote;
 
-
-import androidx.annotation.NonNull;
-import androidx.annotation.VisibleForTesting;
 
 import com.example.android.architecture.blueprints.todoapp.data.model.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksDataSource;
-import com.example.android.architecture.blueprints.todoapp.data.source.remote.TasksRemoteDataSource;
-import com.example.android.architecture.blueprints.todoapp.data.source.remote.TodoApi;
-import com.example.android.architecture.blueprints.todoapp.data.source.remote.helper.ApiHelper;
-import com.google.gson.Gson;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
+import androidx.annotation.NonNull;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
-import okhttp3.OkHttpClient;
 
 /**
- * Implementation of a remote data source with static access to the data for easy testing.
+ * Implementation of the data source that adds a latency simulating network.
  */
-public class FakeTasksRemoteDataSource extends TasksRemoteDataSource implements TasksDataSource {
+public class DummyTasksRemoteDataSource implements TasksDataSource {
 
-    private static final Map<Integer, Task> TASKS_SERVICE_DATA = new LinkedHashMap<>();
-    private static FakeTasksRemoteDataSource INSTANCE;
+    private static DummyTasksRemoteDataSource INSTANCE;
 
-    // Prevent direct instantiation.
-    private FakeTasksRemoteDataSource() {
-        super(new ApiHelper(new OkHttpClient(), new Gson()).getAPI("http://faketodoapp.com/api", TodoApi.class));
+    private static final int SERVICE_LATENCY_IN_MILLIS = 5000;
+
+    private final static Map<Integer, Task> TASKS_SERVICE_DATA;
+
+    static {
+        TASKS_SERVICE_DATA = new LinkedHashMap<>(2);
+        addTask("Build tower in Pisa", "Ground looks good, no foundation work required.");
+        addTask("Finish bridge in Tacoma", "Found awesome girders at half the cost!");
     }
 
-    public static FakeTasksRemoteDataSource getInstance() {
+    public static DummyTasksRemoteDataSource getInstance() {
         if (INSTANCE == null) {
-            INSTANCE = new FakeTasksRemoteDataSource();
+            INSTANCE = new DummyTasksRemoteDataSource();
         }
         return INSTANCE;
     }
 
+    // Prevent direct instantiation.
+    public DummyTasksRemoteDataSource() {
+    }
+
+    private static void addTask(String title, String description) {
+        Task newTask = new Task(title, description);
+        TASKS_SERVICE_DATA.put(newTask.getId(), newTask);
+    }
+
     @Override
     public Single<List<Task>> getTasks() {
-        List<Task> values = new ArrayList<>(TASKS_SERVICE_DATA.values());
-        return Single.just(values);
+        return Observable.fromIterable(TASKS_SERVICE_DATA.values())
+                .delay(SERVICE_LATENCY_IN_MILLIS, TimeUnit.MILLISECONDS)
+                .toList();
     }
 
     @Override
     public Observable<Task> getTask(@NonNull Integer taskId) {
-        Task task = TASKS_SERVICE_DATA.get(taskId);
-        return Observable.just(task);
+        final Task task = TASKS_SERVICE_DATA.get(taskId);
+        if (task != null) {
+            return Observable.just(task).delay(SERVICE_LATENCY_IN_MILLIS, TimeUnit.MILLISECONDS);
+        } else {
+            return Observable.empty();
+        }
     }
 
     @Override
     public Completable saveTask(@NonNull Task task) {
         return Completable.fromAction(() -> TASKS_SERVICE_DATA.put(task.getId(), task));
     }
-
 
     @Override
     public Completable saveTasks(@NonNull List<Task> tasks) {
@@ -95,8 +105,8 @@ public class FakeTasksRemoteDataSource extends TasksRemoteDataSource implements 
     public Completable completeTask(@NonNull Integer taskId) {
         return Completable.fromAction(() -> {
             Task task = TASKS_SERVICE_DATA.get(taskId);
-            Task completedTask = new Task(task.getTitle(), task.getDescription(), task.getId(), true);
-            TASKS_SERVICE_DATA.put(taskId, completedTask);
+            task = new Task(task.getTitle(), task.getDescription(), taskId, true);
+            TASKS_SERVICE_DATA.put(task.getId(), task);
         });
     }
 
@@ -112,14 +122,14 @@ public class FakeTasksRemoteDataSource extends TasksRemoteDataSource implements 
     public Completable activateTask(@NonNull Integer taskId) {
         return Completable.fromAction(() -> {
             Task task = TASKS_SERVICE_DATA.get(taskId);
-            Task activeTask = new Task(task.getTitle(), task.getDescription(), task.getId());
-            TASKS_SERVICE_DATA.put(taskId, activeTask);
+            task = new Task(task.getTitle(), task.getDescription(), taskId, false);
+            TASKS_SERVICE_DATA.put(task.getId(), task);
         });
     }
 
     @Override
     public Completable clearCompletedTasks() {
-        return Completable.fromCallable(() -> {
+        return Completable.fromAction(() -> {
             Iterator<Map.Entry<Integer, Task>> it = TASKS_SERVICE_DATA.entrySet().iterator();
             while (it.hasNext()) {
                 Map.Entry<Integer, Task> entry = it.next();
@@ -127,11 +137,13 @@ public class FakeTasksRemoteDataSource extends TasksRemoteDataSource implements 
                     it.remove();
                 }
             }
-            return it;
         });
     }
 
+    @Override
     public Completable refreshTasks() {
+        // Not required because the {@link TasksRepository} handles the logic of refreshing the
+        // tasks from all the available data sources.
         return Completable.complete();
     }
 
@@ -143,12 +155,5 @@ public class FakeTasksRemoteDataSource extends TasksRemoteDataSource implements 
     @Override
     public Completable deleteAllTasks() {
         return Completable.fromAction(TASKS_SERVICE_DATA::clear);
-    }
-
-    @VisibleForTesting
-    public void addTasks(Task... tasks) {
-        for (Task task : tasks) {
-            TASKS_SERVICE_DATA.put(task.getId(), task);
-        }
     }
 }

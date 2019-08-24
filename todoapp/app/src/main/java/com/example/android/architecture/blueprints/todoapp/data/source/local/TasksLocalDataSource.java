@@ -95,8 +95,8 @@ public class TasksLocalDataSource implements TasksDataSource {
     }
 
     @Override
-    public void clearCompletedTasks() {
-        mTaskDao.deleteTask(1);
+    public Completable clearCompletedTasks() {
+        return mTaskDao.deleteTask(1);
     }
 
     @Override

@@ -19,8 +19,9 @@ package com.example.android.architecture.blueprints.todoapp.data.model;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Strings;
+import com.google.gson.annotations.SerializedName;
 
-import java.util.UUID;
+import java.util.Random;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -38,17 +39,21 @@ public final class Task {
     @NonNull
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id")
+    @SerializedName("id")
     private Integer mId;
 
     @Nullable
     @ColumnInfo(name = "title")
+    @SerializedName("title")
     private String mTitle;
 
     @Nullable
     @ColumnInfo(name = "description")
+    @SerializedName("description")
     private String mDescription;
 
     @ColumnInfo(name = "completed")
+    @SerializedName("completed")
     private boolean mCompleted;
 
     /**
@@ -83,7 +88,7 @@ public final class Task {
      */
     @Ignore
     public Task(@Nullable String title, @Nullable String description, boolean completed) {
-        this(title, description, UUID.randomUUID().clockSequence(), completed);
+        this(title, description, new Random().nextInt(10), completed);
     }
 
     /**
