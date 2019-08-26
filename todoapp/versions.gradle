@@ -5,7 +5,7 @@
 ext.deps = [:]
 
 def versions = [:]
-versions.android_gradle_plugin = '3.3.2'
+versions.android_gradle_plugin = '3.5.0'
 versions.firebase_gradle_plugin = '4.2.0'
 versions.support = "1.0.0"
 versions.app_compat = "1.0.2"

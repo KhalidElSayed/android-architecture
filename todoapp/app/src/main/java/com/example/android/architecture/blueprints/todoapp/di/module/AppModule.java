@@ -8,7 +8,6 @@ import com.example.android.architecture.blueprints.todoapp.util.providers.Resour
 
 import javax.inject.Singleton;
 
-import dagger.Binds;
 import dagger.Module;
 import dagger.Provides;
 
@@ -16,7 +15,7 @@ import dagger.Provides;
 public class AppModule {
 
   @Provides
-  Context bindContext(ToDoApplication application) {
+  Context provideContext(ToDoApplication application) {
     return application;
   }
 

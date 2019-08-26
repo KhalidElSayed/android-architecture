@@ -2,7 +2,6 @@ package com.example.android.architecture.blueprints.todoapp;
 
 import android.os.StrictMode;
 
-
 import com.example.android.architecture.blueprints.todoapp.di.DaggerAppComponent;
 
 import dagger.android.AndroidInjector;

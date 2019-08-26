@@ -1,9 +1,9 @@
 package com.example.android.architecture.blueprints.todoapp.di.module;
 
-import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskActivity;
-import com.example.android.architecture.blueprints.todoapp.statistics.StatisticsActivity;
-import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailActivity;
-import com.example.android.architecture.blueprints.todoapp.tasks.TasksActivity;
+import com.example.android.architecture.blueprints.todoapp.ui.addedittask.AddEditTaskActivity;
+import com.example.android.architecture.blueprints.todoapp.ui.statistics.StatisticsActivity;
+import com.example.android.architecture.blueprints.todoapp.ui.taskdetail.TaskDetailActivity;
+import com.example.android.architecture.blueprints.todoapp.ui.tasks.TasksActivity;
 
 import dagger.Module;
 import dagger.android.ContributesAndroidInjector;

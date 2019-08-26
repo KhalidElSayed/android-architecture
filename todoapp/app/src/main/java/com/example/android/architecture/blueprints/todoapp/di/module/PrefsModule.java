@@ -1,7 +1,5 @@
 package com.example.android.architecture.blueprints.todoapp.di.module;
 
-import android.app.Application;
-
 import com.example.android.architecture.blueprints.todoapp.ToDoApplication;
 import com.google.gson.Gson;
 

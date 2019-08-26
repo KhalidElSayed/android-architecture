@@ -1,15 +1,14 @@
 package com.example.android.architecture.blueprints.todoapp.di.module;
 
+import com.example.android.architecture.blueprints.todoapp.di.ViewModelKey;
+import com.example.android.architecture.blueprints.todoapp.ui.addedittask.AddEditTaskViewModel;
+import com.example.android.architecture.blueprints.todoapp.ui.base.viewmodel.ViewModelFactory;
+import com.example.android.architecture.blueprints.todoapp.ui.statistics.StatisticsViewModel;
+import com.example.android.architecture.blueprints.todoapp.ui.taskdetail.TaskDetailViewModel;
+import com.example.android.architecture.blueprints.todoapp.ui.tasks.TasksViewModel;
+
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
-
-import com.example.android.architecture.blueprints.todoapp.addedittask.AddEditTaskViewModel;
-import com.example.android.architecture.blueprints.todoapp.base.viewmodel.ViewModelFactory;
-import com.example.android.architecture.blueprints.todoapp.di.ViewModelKey;
-import com.example.android.architecture.blueprints.todoapp.statistics.StatisticsViewModel;
-import com.example.android.architecture.blueprints.todoapp.taskdetail.TaskDetailViewModel;
-import com.example.android.architecture.blueprints.todoapp.tasks.TasksViewModel;
-
 import dagger.Binds;
 import dagger.Module;
 import dagger.multibindings.IntoMap;
@@ -23,21 +22,21 @@ public abstract class ViewModelModule {
   @Binds
   @IntoMap
   @ViewModelKey(TasksViewModel.class)
-  protected abstract ViewModel bindSplashViewModel(TasksViewModel splashViewModel);
+  protected abstract ViewModel bindTasksViewModel(TasksViewModel splashViewModel);
 
   @Binds
   @IntoMap
   @ViewModelKey(AddEditTaskViewModel.class)
-  protected abstract ViewModel bindObservationViewModel(AddEditTaskViewModel observationViewModel);
+  protected abstract ViewModel bindAddEditTaskViewModel(AddEditTaskViewModel observationViewModel);
 
   @Binds
   @IntoMap
   @ViewModelKey(TaskDetailViewModel.class)
-  protected abstract ViewModel bindMonitorViewModel(TaskDetailViewModel monitorViewModel);
+  protected abstract ViewModel bindTaskDetailViewModel(TaskDetailViewModel monitorViewModel);
 
   @Binds
   @IntoMap
   @ViewModelKey(StatisticsViewModel.class)
-  protected abstract ViewModel bindSearchViewModel(StatisticsViewModel searchViewModel);
+  protected abstract ViewModel bindStatisticsViewModel(StatisticsViewModel searchViewModel);
 
 }

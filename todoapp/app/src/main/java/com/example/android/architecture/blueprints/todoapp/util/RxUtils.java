@@ -3,7 +3,7 @@ package com.example.android.architecture.blueprints.todoapp.util;
 
 import android.util.Pair;
 
-import com.example.android.architecture.blueprints.todoapp.base.view.BaseView;
+import com.example.android.architecture.blueprints.todoapp.ui.base.view.BaseView;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableTransformer;
