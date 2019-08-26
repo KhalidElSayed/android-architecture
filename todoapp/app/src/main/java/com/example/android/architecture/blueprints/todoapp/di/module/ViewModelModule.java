@@ -1,11 +1,11 @@
 package com.example.android.architecture.blueprints.todoapp.di.module;
 
 import com.example.android.architecture.blueprints.todoapp.di.ViewModelKey;
-import com.example.android.architecture.blueprints.todoapp.ui.addedittask.AddEditTaskViewModel;
+import com.example.android.architecture.blueprints.todoapp.ui.addedittask.viewmodel.AddEditTaskViewModel;
 import com.example.android.architecture.blueprints.todoapp.ui.base.viewmodel.ViewModelFactory;
-import com.example.android.architecture.blueprints.todoapp.ui.statistics.StatisticsViewModel;
-import com.example.android.architecture.blueprints.todoapp.ui.taskdetail.TaskDetailViewModel;
-import com.example.android.architecture.blueprints.todoapp.ui.tasks.TasksViewModel;
+import com.example.android.architecture.blueprints.todoapp.ui.statistics.viewmodel.StatisticsViewModel;
+import com.example.android.architecture.blueprints.todoapp.ui.taskdetail.viewmodel.TaskDetailViewModel;
+import com.example.android.architecture.blueprints.todoapp.ui.tasks.viewmodel.TasksViewModel;
 
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;

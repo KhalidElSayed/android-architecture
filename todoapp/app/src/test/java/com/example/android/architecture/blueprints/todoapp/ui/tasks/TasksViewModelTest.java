@@ -3,9 +3,14 @@ package com.example.android.architecture.blueprints.todoapp.ui.tasks;
 import android.app.Activity;
 
 import com.example.android.architecture.blueprints.todoapp.R;
-import com.example.android.architecture.blueprints.todoapp.ui.addedittask.AddEditTaskActivity;
+import com.example.android.architecture.blueprints.todoapp.ui.addedittask.view.AddEditTaskActivity;
 import com.example.android.architecture.blueprints.todoapp.data.model.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
+import com.example.android.architecture.blueprints.todoapp.ui.tasks.navigator.TasksNavigator;
+import com.example.android.architecture.blueprints.todoapp.ui.tasks.uimodel.NoTasksModel;
+import com.example.android.architecture.blueprints.todoapp.ui.tasks.uimodel.TaskItem;
+import com.example.android.architecture.blueprints.todoapp.ui.tasks.uimodel.TasksUiModel;
+import com.example.android.architecture.blueprints.todoapp.ui.tasks.viewmodel.TasksViewModel;
 import com.example.android.architecture.blueprints.todoapp.util.schedulers.ImmediateSchedulerProvider;
 import com.google.common.collect.Lists;
 
@@ -22,9 +27,9 @@ import io.reactivex.Completable;
 import io.reactivex.Single;
 import io.reactivex.observers.TestObserver;
 
-import static com.example.android.architecture.blueprints.todoapp.ui.tasks.TasksFilterType.ACTIVE_TASKS;
-import static com.example.android.architecture.blueprints.todoapp.ui.tasks.TasksFilterType.ALL_TASKS;
-import static com.example.android.architecture.blueprints.todoapp.ui.tasks.TasksFilterType.COMPLETED_TASKS;
+import static com.example.android.architecture.blueprints.todoapp.util.TasksFilterType.ACTIVE_TASKS;
+import static com.example.android.architecture.blueprints.todoapp.util.TasksFilterType.ALL_TASKS;
+import static com.example.android.architecture.blueprints.todoapp.util.TasksFilterType.COMPLETED_TASKS;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;

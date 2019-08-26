@@ -29,6 +29,7 @@ import com.example.android.architecture.blueprints.todoapp.TestUtils;
 import com.example.android.architecture.blueprints.todoapp.data.model.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.example.android.architecture.blueprints.todoapp.data.source.local.TasksLocalDataSource;
+import com.example.android.architecture.blueprints.todoapp.ui.taskdetail.view.TaskDetailActivity;
 
 import org.junit.Rule;
 import org.junit.Test;

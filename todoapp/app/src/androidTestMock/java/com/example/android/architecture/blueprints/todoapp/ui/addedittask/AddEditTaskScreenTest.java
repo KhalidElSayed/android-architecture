@@ -18,6 +18,7 @@ package com.example.android.architecture.blueprints.todoapp.ui.addedittask;
 
 
 import com.example.android.architecture.blueprints.todoapp.R;
+import com.example.android.architecture.blueprints.todoapp.ui.addedittask.view.AddEditTaskActivity;
 
 import org.junit.After;
 import org.junit.Before;

@@ -26,7 +26,8 @@ import com.example.android.architecture.blueprints.todoapp.Injection;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.data.model.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
-import com.example.android.architecture.blueprints.todoapp.ui.taskdetail.TaskDetailActivity;
+import com.example.android.architecture.blueprints.todoapp.ui.statistics.view.StatisticsActivity;
+import com.example.android.architecture.blueprints.todoapp.ui.taskdetail.view.TaskDetailActivity;
 
 import org.junit.Before;
 import org.junit.Rule;

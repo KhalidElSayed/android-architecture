@@ -5,6 +5,10 @@ import android.app.Activity;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.data.model.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
+import com.example.android.architecture.blueprints.todoapp.ui.taskdetail.navigator.TaskDetailNavigator;
+import com.example.android.architecture.blueprints.todoapp.ui.taskdetail.uimodel.TaskUiModel;
+import com.example.android.architecture.blueprints.todoapp.ui.taskdetail.view.TaskDetailActivity;
+import com.example.android.architecture.blueprints.todoapp.ui.taskdetail.viewmodel.TaskDetailViewModel;
 
 import org.junit.Before;
 import org.junit.Test;

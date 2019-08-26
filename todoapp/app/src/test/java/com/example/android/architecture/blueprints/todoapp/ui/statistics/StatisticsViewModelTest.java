@@ -3,6 +3,8 @@ package com.example.android.architecture.blueprints.todoapp.ui.statistics;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.data.model.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
+import com.example.android.architecture.blueprints.todoapp.ui.statistics.uimodel.StatisticsUiModel;
+import com.example.android.architecture.blueprints.todoapp.ui.statistics.viewmodel.StatisticsViewModel;
 import com.example.android.architecture.blueprints.todoapp.util.providers.BaseResourceProvider;
 import com.google.common.collect.Lists;
 

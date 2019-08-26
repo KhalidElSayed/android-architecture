@@ -19,6 +19,7 @@ package com.example.android.architecture.blueprints.todoapp.ui.tasks;
 import android.view.Gravity;
 
 import com.example.android.architecture.blueprints.todoapp.R;
+import com.example.android.architecture.blueprints.todoapp.ui.tasks.view.TasksActivity;
 
 import org.junit.Rule;
 import org.junit.Test;

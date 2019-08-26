@@ -3,6 +3,9 @@ package com.example.android.architecture.blueprints.todoapp.ui.addedittask;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.data.model.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
+import com.example.android.architecture.blueprints.todoapp.ui.addedittask.navigator.AddEditTaskNavigator;
+import com.example.android.architecture.blueprints.todoapp.ui.addedittask.uimodel.AddEditTaskUiModel;
+import com.example.android.architecture.blueprints.todoapp.ui.addedittask.viewmodel.AddEditTaskViewModel;
 
 import org.junit.Before;
 import org.junit.Test;

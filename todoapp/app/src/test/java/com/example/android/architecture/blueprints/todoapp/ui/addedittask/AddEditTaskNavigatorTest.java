@@ -2,6 +2,7 @@ package com.example.android.architecture.blueprints.todoapp.ui.addedittask;
 
 import android.app.Activity;
 
+import com.example.android.architecture.blueprints.todoapp.ui.addedittask.navigator.AddEditTaskNavigator;
 import com.example.android.architecture.blueprints.todoapp.util.providers.BaseNavigator;
 
 import org.junit.Before;

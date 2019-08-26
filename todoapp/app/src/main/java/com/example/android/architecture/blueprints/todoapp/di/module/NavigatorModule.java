@@ -1,8 +1,8 @@
 package com.example.android.architecture.blueprints.todoapp.di.module;
 
-import com.example.android.architecture.blueprints.todoapp.ui.addedittask.AddEditTaskActivity;
-import com.example.android.architecture.blueprints.todoapp.ui.taskdetail.TaskDetailActivity;
-import com.example.android.architecture.blueprints.todoapp.ui.tasks.TasksActivity;
+import com.example.android.architecture.blueprints.todoapp.ui.addedittask.view.AddEditTaskActivity;
+import com.example.android.architecture.blueprints.todoapp.ui.taskdetail.view.TaskDetailActivity;
+import com.example.android.architecture.blueprints.todoapp.ui.tasks.view.TasksActivity;
 import com.example.android.architecture.blueprints.todoapp.util.providers.BaseNavigator;
 import com.example.android.architecture.blueprints.todoapp.util.providers.Navigator;
 
