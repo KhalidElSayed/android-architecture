@@ -89,6 +89,9 @@ android {
 
     // If you need to add more flavors, consider using flavor dimensions.
     productFlavors {
+        dev {
+            dimension 'buildType'
+        }
         mock {
             dimension 'buildType'
             applicationIdSuffix = ".mock"
@@ -102,6 +105,9 @@ android {
     android.variantFilter { variant ->
         if (variant.buildType.name.equals('release')
                 && variant.getFlavors().get(0).name.equals('mock')) {
+            variant.setIgnore(true)
+        } else if (variant.buildType.name.equals('release')
+                && variant.getFlavors().get(0).name.equals('dev')) {
             variant.setIgnore(true)
         }
     }
