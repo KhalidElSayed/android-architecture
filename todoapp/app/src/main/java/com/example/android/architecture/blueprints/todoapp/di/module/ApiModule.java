@@ -5,7 +5,7 @@ import com.example.android.architecture.blueprints.todoapp.data.source.remote.To
 import com.example.android.architecture.blueprints.todoapp.data.source.remote.helper.ApiAuthenticator;
 import com.example.android.architecture.blueprints.todoapp.data.source.remote.helper.ApiHelper;
 import com.example.android.architecture.blueprints.todoapp.data.source.remote.helper.AuthenticationInterceptor;
-import com.example.android.architecture.blueprints.todoapp.util.annotations.BaseUrl;
+import com.example.android.architecture.blueprints.todoapp.util.annotations.api.BaseUrl;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 

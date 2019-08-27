@@ -3,8 +3,8 @@ package com.example.android.architecture.blueprints.todoapp.data.source.remote.h
 import com.example.android.architecture.blueprints.todoapp.data.model.Token;
 import com.example.android.architecture.blueprints.todoapp.data.source.local.helper.PrefsHelper;
 import com.example.android.architecture.blueprints.todoapp.util.NetworkUtils;
-import com.example.android.architecture.blueprints.todoapp.util.annotations.AuthScope;
-import com.example.android.architecture.blueprints.todoapp.util.annotations.NoAuth;
+import com.example.android.architecture.blueprints.todoapp.util.annotations.api.AuthScope;
+import com.example.android.architecture.blueprints.todoapp.util.annotations.api.NoAuth;
 
 import java.io.IOException;
 

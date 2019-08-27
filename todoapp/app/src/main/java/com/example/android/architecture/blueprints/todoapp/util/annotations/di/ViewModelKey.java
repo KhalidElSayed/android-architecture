@@ -1,4 +1,4 @@
-package com.example.android.architecture.blueprints.todoapp.di;
+package com.example.android.architecture.blueprints.todoapp.util.annotations.di;
 
 import androidx.lifecycle.ViewModel;
 

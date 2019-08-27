@@ -1,4 +1,4 @@
-package com.example.android.architecture.blueprints.todoapp.util.annotations;
+package com.example.android.architecture.blueprints.todoapp.util.annotations.api;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

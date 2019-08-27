@@ -1,9 +1,9 @@
 package com.example.android.architecture.blueprints.todoapp.data.source.remote;
 
 import com.example.android.architecture.blueprints.todoapp.data.model.Task;
-import com.example.android.architecture.blueprints.todoapp.util.annotations.AuthScope;
-import com.example.android.architecture.blueprints.todoapp.util.annotations.Authentication;
-import com.example.android.architecture.blueprints.todoapp.util.annotations.NoAuth;
+import com.example.android.architecture.blueprints.todoapp.util.annotations.api.AuthScope;
+import com.example.android.architecture.blueprints.todoapp.util.annotations.api.Authentication;
+import com.example.android.architecture.blueprints.todoapp.util.annotations.api.NoAuth;
 import com.google.gson.JsonObject;
 
 import java.util.List;

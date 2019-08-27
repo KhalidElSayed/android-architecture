@@ -4,8 +4,8 @@ import com.example.android.architecture.blueprints.todoapp.data.model.Token;
 import com.example.android.architecture.blueprints.todoapp.data.source.local.helper.PrefsHelper;
 import com.example.android.architecture.blueprints.todoapp.util.NetworkUtils;
 import com.example.android.architecture.blueprints.todoapp.util.StringUtils;
-import com.example.android.architecture.blueprints.todoapp.util.annotations.AuthScope;
-import com.example.android.architecture.blueprints.todoapp.util.annotations.Authentication;
+import com.example.android.architecture.blueprints.todoapp.util.annotations.api.AuthScope;
+import com.example.android.architecture.blueprints.todoapp.util.annotations.api.Authentication;
 
 import java.io.IOException;
 
