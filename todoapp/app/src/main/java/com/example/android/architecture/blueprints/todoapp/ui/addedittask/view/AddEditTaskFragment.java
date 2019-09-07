@@ -24,6 +24,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.android.architecture.blueprints.todoapp.R;
+import com.example.android.architecture.blueprints.todoapp.ui.addedittask.navigator.AddEditTaskNavigator;
 import com.example.android.architecture.blueprints.todoapp.ui.addedittask.uimodel.AddEditTaskUiModel;
 import com.example.android.architecture.blueprints.todoapp.ui.addedittask.viewmodel.AddEditTaskViewModel;
 import com.example.android.architecture.blueprints.todoapp.ui.base.view.BaseFragment;
@@ -65,6 +66,9 @@ public class AddEditTaskFragment extends BaseFragment {
      * */
     @Inject
     CompositeDisposable mDisposable;
+
+    @Inject
+    AddEditTaskNavigator mNavigator;
 
     public static AddEditTaskFragment newInstance(String taskId) {
         Bundle arguments = new Bundle();
@@ -118,7 +122,7 @@ public class AddEditTaskFragment extends BaseFragment {
         // The ViewModel holds an observable containing the state of the UI.
         // subscribe to the emissions of the UiModel
         // every time a new UiModel is emitted update the Ui
-        mDisposable.add(mViewModel.getUiModel(getTaskId())
+        mDisposable.add(mViewModel.getUiModel(getTaskId(), mNavigator)
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(

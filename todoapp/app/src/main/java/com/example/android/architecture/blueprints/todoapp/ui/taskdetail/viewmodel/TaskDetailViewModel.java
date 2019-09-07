@@ -47,6 +47,7 @@ public class TaskDetailViewModel extends BaseViewModel {
 
   private TasksRepository mTasksRepository;
 
+  @NonNull
   private TaskDetailNavigator mNavigator;
 
   /**
@@ -64,10 +65,8 @@ public class TaskDetailViewModel extends BaseViewModel {
   private final PublishSubject<Integer> mSnackbarText;
 
   @Inject
-  public TaskDetailViewModel(@NonNull TasksRepository tasksRepository,
-                             @NonNull TaskDetailNavigator navigator) {
+  public TaskDetailViewModel(@NonNull TasksRepository tasksRepository) {
     mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null!");
-    mNavigator = checkNotNull(navigator, "navigator cannot be null");
     mLoadingSubject = BehaviorSubject.createDefault(false);
     mSnackbarText = PublishSubject.create();
   }
@@ -86,7 +85,8 @@ public class TaskDetailViewModel extends BaseViewModel {
    * task has been retrieved.
    */
   @NonNull
-  public Observable<TaskUiModel> getTaskUiModel(@Nullable Integer taskId) {
+  public Observable<TaskUiModel> getTaskUiModel(@Nullable Integer taskId, @NonNull TaskDetailNavigator navigator) {
+    mNavigator = checkNotNull(navigator, "navigator cannot be null");
     //if (Strings.isNullOrEmpty(mTaskId)) {
     if (taskId == null) {
       return Observable.error(new Exception("Task id null or empty"));

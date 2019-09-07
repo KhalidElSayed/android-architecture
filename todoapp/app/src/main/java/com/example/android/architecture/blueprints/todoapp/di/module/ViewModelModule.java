@@ -22,21 +22,21 @@ public abstract class ViewModelModule {
   @Binds
   @IntoMap
   @ViewModelKey(TasksViewModel.class)
-  protected abstract ViewModel bindTasksViewModel(TasksViewModel splashViewModel);
-
-  @Binds
-  @IntoMap
-  @ViewModelKey(AddEditTaskViewModel.class)
-  protected abstract ViewModel bindAddEditTaskViewModel(AddEditTaskViewModel observationViewModel);
+  protected abstract ViewModel bindTasksViewModel(TasksViewModel tasksViewModel);
 
   @Binds
   @IntoMap
   @ViewModelKey(TaskDetailViewModel.class)
-  protected abstract ViewModel bindTaskDetailViewModel(TaskDetailViewModel monitorViewModel);
+  protected abstract ViewModel bindTaskDetailViewModel(TaskDetailViewModel taskDetailViewModel);
+
+  @Binds
+  @IntoMap
+  @ViewModelKey(AddEditTaskViewModel.class)
+  protected abstract ViewModel bindAddEditTaskViewModel(AddEditTaskViewModel addEditTaskViewModel);
 
   @Binds
   @IntoMap
   @ViewModelKey(StatisticsViewModel.class)
-  protected abstract ViewModel bindStatisticsViewModel(StatisticsViewModel searchViewModel);
+  protected abstract ViewModel bindStatisticsViewModel(StatisticsViewModel statisticsViewModel);
 
 }

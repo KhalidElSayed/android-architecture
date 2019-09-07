@@ -5,7 +5,7 @@ import android.os.StrictMode;
 import com.example.android.architecture.blueprints.todoapp.di.DaggerAppComponent;
 
 import dagger.android.AndroidInjector;
-import dagger.android.DaggerApplication;
+import dagger.android.support.DaggerApplication;
 import io.reactivex.plugins.RxJavaPlugins;
 import timber.log.Timber;
 
@@ -26,8 +26,8 @@ public class ToDoApplication extends DaggerApplication {
     }
 
     @Override
-    protected AndroidInjector<ToDoApplication> applicationInjector() {
-        return DaggerAppComponent.builder().create(this);
+    protected AndroidInjector<? extends DaggerApplication> applicationInjector() {
+        return DaggerAppComponent.factory().create(this);
     }
 
     private void setStrictMode() {

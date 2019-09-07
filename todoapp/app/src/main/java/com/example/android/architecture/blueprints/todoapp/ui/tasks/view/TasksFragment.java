@@ -31,15 +31,16 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.example.android.architecture.blueprints.todoapp.R;
+import com.example.android.architecture.blueprints.todoapp.data.model.Task;
 import com.example.android.architecture.blueprints.todoapp.ui.base.view.BaseFragment;
 import com.example.android.architecture.blueprints.todoapp.ui.base.viewmodel.ViewModelFactory;
-import com.example.android.architecture.blueprints.todoapp.data.model.Task;
-import com.example.android.architecture.blueprints.todoapp.widget.ScrollChildSwipeRefreshLayout;
-import com.example.android.architecture.blueprints.todoapp.util.TasksFilterType;
+import com.example.android.architecture.blueprints.todoapp.ui.tasks.navigator.TasksNavigator;
 import com.example.android.architecture.blueprints.todoapp.ui.tasks.uimodel.NoTasksModel;
 import com.example.android.architecture.blueprints.todoapp.ui.tasks.uimodel.TaskItem;
 import com.example.android.architecture.blueprints.todoapp.ui.tasks.uimodel.TasksUiModel;
 import com.example.android.architecture.blueprints.todoapp.ui.tasks.viewmodel.TasksViewModel;
+import com.example.android.architecture.blueprints.todoapp.util.TasksFilterType;
+import com.example.android.architecture.blueprints.todoapp.widget.ScrollChildSwipeRefreshLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -90,6 +91,9 @@ public class TasksFragment extends BaseFragment {
      * */
     @Inject
     CompositeDisposable mDisposable;
+
+    @Inject
+    TasksNavigator mNavigator;
 
     public TasksFragment() {
         // Requires empty public constructor
@@ -174,7 +178,7 @@ public class TasksFragment extends BaseFragment {
         // The ViewModel holds an observable containing the state of the UI.
         // subscribe to the emissions of the Ui Model
         // update the view at every emission fo the Ui Model
-        mDisposable.add(mViewModel.getUiModel()
+        mDisposable.add(mViewModel.getUiModel(mNavigator)
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(

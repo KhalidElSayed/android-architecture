@@ -9,11 +9,11 @@ import com.example.android.architecture.blueprints.todoapp.data.model.Task;
 import com.example.android.architecture.blueprints.todoapp.data.source.TasksRepository;
 import com.example.android.architecture.blueprints.todoapp.ui.addedittask.view.AddEditTaskActivity;
 import com.example.android.architecture.blueprints.todoapp.ui.base.viewmodel.BaseViewModel;
-import com.example.android.architecture.blueprints.todoapp.util.TasksFilterType;
 import com.example.android.architecture.blueprints.todoapp.ui.tasks.navigator.TasksNavigator;
 import com.example.android.architecture.blueprints.todoapp.ui.tasks.uimodel.NoTasksModel;
 import com.example.android.architecture.blueprints.todoapp.ui.tasks.uimodel.TaskItem;
 import com.example.android.architecture.blueprints.todoapp.ui.tasks.uimodel.TasksUiModel;
+import com.example.android.architecture.blueprints.todoapp.util.TasksFilterType;
 import com.example.android.architecture.blueprints.todoapp.util.schedulers.BaseSchedulerProvider;
 
 import java.util.List;
@@ -46,7 +46,7 @@ public final class TasksViewModel extends BaseViewModel {
     private final TasksRepository mTasksRepository;
 
     @NonNull
-    private final TasksNavigator mNavigator;
+    private TasksNavigator mNavigator;
 
     @NonNull
     private final BaseSchedulerProvider mSchedulerProvider;
@@ -73,10 +73,8 @@ public final class TasksViewModel extends BaseViewModel {
 
     @Inject
     public TasksViewModel(@NonNull TasksRepository tasksRepository,
-                          @NonNull TasksNavigator navigationProvider,
                           @NonNull BaseSchedulerProvider schedulerProvider) {
         mTasksRepository = checkNotNull(tasksRepository, "TaskRepository cannot be null");
-        mNavigator = checkNotNull(navigationProvider, "Navigator cannot be null");
         mSchedulerProvider = checkNotNull(schedulerProvider, "SchedulerProvider cannot be null");
 
         mLoadingIndicatorSubject = BehaviorSubject.createDefault(false);
@@ -89,7 +87,8 @@ public final class TasksViewModel extends BaseViewModel {
      * @return the model for the tasks list.
      */
     @NonNull
-    public Observable<TasksUiModel> getUiModel() {
+    public Observable<TasksUiModel> getUiModel(@NonNull TasksNavigator navigationProvider) {
+        mNavigator = checkNotNull(navigationProvider, "Navigator cannot be null");
         return getTaskItems()
                 .doOnSubscribe(disposable -> mLoadingIndicatorSubject.onNext(true))
                 .doOnNext(__ -> mLoadingIndicatorSubject.onNext(false))

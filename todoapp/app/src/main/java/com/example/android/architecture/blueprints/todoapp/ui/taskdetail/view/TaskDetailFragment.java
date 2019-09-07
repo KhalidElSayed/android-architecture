@@ -31,6 +31,7 @@ import android.widget.TextView;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.ui.base.view.BaseFragment;
 import com.example.android.architecture.blueprints.todoapp.ui.base.viewmodel.ViewModelFactory;
+import com.example.android.architecture.blueprints.todoapp.ui.taskdetail.navigator.TaskDetailNavigator;
 import com.example.android.architecture.blueprints.todoapp.ui.taskdetail.uimodel.TaskUiModel;
 import com.example.android.architecture.blueprints.todoapp.ui.taskdetail.viewmodel.TaskDetailViewModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -75,6 +76,9 @@ public class TaskDetailFragment extends BaseFragment {
      * */
     @Inject
     CompositeDisposable mDisposable;
+
+    @Inject
+    TaskDetailNavigator mNavigator;
 
     public static TaskDetailFragment newInstance(@Nullable String taskId) {
         Bundle arguments = new Bundle();
@@ -124,7 +128,7 @@ public class TaskDetailFragment extends BaseFragment {
     private void bindViewModel() {
         // subscribe to the emissions of the Ui Model
         // every time a new Ui Model, update the View
-        mDisposable.add(mViewModel.getTaskUiModel(getTaskId())
+        mDisposable.add(mViewModel.getTaskUiModel(getTaskId(), mNavigator)
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(

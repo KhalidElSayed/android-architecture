@@ -28,7 +28,7 @@ public class AddEditTaskViewModel extends BaseViewModel {
     private final TasksRepository mTasksRepository;
 
     @NonNull
-    private final AddEditTaskNavigator mNavigator;
+    private AddEditTaskNavigator mNavigator;
 
     /**
      * using a PublishSubject because we are not interested in the last object that was emitted
@@ -44,10 +44,8 @@ public class AddEditTaskViewModel extends BaseViewModel {
     private String mRestoredDescription;
 
     @Inject
-    public AddEditTaskViewModel(@NonNull TasksRepository tasksRepository,
-                                @NonNull AddEditTaskNavigator navigator) {
+    public AddEditTaskViewModel(@NonNull TasksRepository tasksRepository) {
         mTasksRepository = checkNotNull(tasksRepository, "TaskRepository cannot be null");
-        mNavigator = checkNotNull(navigator, "navigator cannot be null");
         mSnackbarText = PublishSubject.create();
     }
 
@@ -64,7 +62,8 @@ public class AddEditTaskViewModel extends BaseViewModel {
      * @return a stream containing the model for the UI.
      */
     @NonNull
-    public Observable<AddEditTaskUiModel> getUiModel(@Nullable Integer taskId) {
+    public Observable<AddEditTaskUiModel> getUiModel(@Nullable Integer taskId, @NonNull AddEditTaskNavigator navigator) {
+        mNavigator = checkNotNull(navigator, "navigator cannot be null");
 //        if (Strings.isNullOrEmpty(taskId)) {
         if (taskId == null) {
             // new task. nothing to do here.
