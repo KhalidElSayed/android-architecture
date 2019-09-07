@@ -8,6 +8,7 @@ import android.widget.TextView;
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.ui.tasks.uimodel.TaskItem;
 
+import androidx.recyclerview.widget.RecyclerView;
 import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 
@@ -15,7 +16,7 @@ import io.reactivex.functions.Consumer;
 /**
  * View holder for the task item.
  */
-final class TaskItemViewHolder implements View.OnClickListener, CheckBox.OnCheckedChangeListener {
+final class TaskItemViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, CheckBox.OnCheckedChangeListener {
 
     private View mRow;
 
@@ -28,6 +29,7 @@ final class TaskItemViewHolder implements View.OnClickListener, CheckBox.OnCheck
     private Consumer<Boolean> mOnCheckAction;
 
     public TaskItemViewHolder(View rowView) {
+        super(rowView);
         mRow = rowView;
         mTitle = rowView.findViewById(R.id.title);
         mCheckBox = rowView.findViewById(R.id.complete);

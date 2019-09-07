@@ -27,7 +27,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.example.android.architecture.blueprints.todoapp.R;
@@ -44,7 +43,6 @@ import com.example.android.architecture.blueprints.todoapp.widget.ScrollChildSwi
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -54,6 +52,7 @@ import androidx.annotation.StringRes;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -112,19 +111,19 @@ public class TasksFragment extends BaseFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mListAdapter = new TasksAdapter(new ArrayList<>(0));
-
         View root = inflater.inflate(R.layout.tasks_frag, container, false);
 
+        mListAdapter = new TasksAdapter();
+
         // Set up tasks view
-        ListView listView = root.findViewById(R.id.tasks_list);
-        listView.setAdapter(mListAdapter);
+        RecyclerView recyclerView = root.findViewById(R.id.tasks_list);
+        recyclerView.setAdapter(mListAdapter);
         mFilteringLabelView = root.findViewById(R.id.filteringLabel);
         mTasksView = root.findViewById(R.id.tasksLL);
 
         setupNoTasksView(root);
         setupFabButton();
-        setupSwipeRefreshLayout(root, listView);
+        setupSwipeRefreshLayout(root, recyclerView);
 
         setHasOptionsMenu(true);
 
@@ -242,16 +241,18 @@ public class TasksFragment extends BaseFragment {
         mNoTaskAddView.setOnClickListener(__ -> mViewModel.addNewTask());
     }
 
-    private void setupSwipeRefreshLayout(View root, ListView listView) {
+    private void setupSwipeRefreshLayout(View root, RecyclerView recyclerView) {
         final ScrollChildSwipeRefreshLayout swipeRefreshLayout =
                 root.findViewById(R.id.refresh_layout);
+
         swipeRefreshLayout.setColorSchemeColors(
                 ContextCompat.getColor(getActivity(), R.color.colorPrimary),
                 ContextCompat.getColor(getActivity(), R.color.colorAccent),
                 ContextCompat.getColor(getActivity(), R.color.colorPrimaryDark)
         );
+
         // Set the scrolling view in the custom SwipeRefreshLayout.
-        swipeRefreshLayout.setScrollUpChild(listView);
+        swipeRefreshLayout.setScrollUpChild(recyclerView);
 
         swipeRefreshLayout.setOnRefreshListener(this::forceUpdate);
     }
