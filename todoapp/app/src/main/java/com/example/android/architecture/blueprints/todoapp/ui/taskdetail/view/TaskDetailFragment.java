@@ -18,7 +18,6 @@ package com.example.android.architecture.blueprints.todoapp.ui.taskdetail.view;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -46,13 +45,12 @@ import androidx.lifecycle.ViewModelProviders;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
+import timber.log.Timber;
 
 /**
  * Main UI for the task detail screen.
  */
 public class TaskDetailFragment extends BaseFragment {
-
-    private static final String TAG = TaskDetailFragment.class.getSimpleName();
 
     @NonNull
     private static final String ARGUMENT_TASK_ID = "TASK_ID";
@@ -158,7 +156,7 @@ public class TaskDetailFragment extends BaseFragment {
                         // onNext
                         this::showSnackbar,
                         // onError
-                        throwable -> Log.e(TAG, "Unable to display snackbar text", throwable)));
+                        throwable -> Timber.e(throwable, "Unable to display snackbar text")));
     }
 
     private void unbindViewModel() {

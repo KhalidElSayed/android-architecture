@@ -17,7 +17,6 @@
 package com.example.android.architecture.blueprints.todoapp.ui.addedittask.view;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,6 +39,7 @@ import androidx.lifecycle.ViewModelProviders;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
+import timber.log.Timber;
 
 /**
  * Main UI for the add task screen. Users can enter a task title and description.
@@ -49,7 +49,6 @@ public class AddEditTaskFragment extends BaseFragment {
     public static final String ARGUMENT_EDIT_TASK_ID = "EDIT_TASK_ID";
     private static final String TASK_TITLE_KEY = "title";
     private static final String TASK_DESCRIPTION_KEY = "description";
-    private static final String TAG = AddEditTaskFragment.class.getSimpleName();
 
     private TextView mTitle;
 
@@ -117,7 +116,7 @@ public class AddEditTaskFragment extends BaseFragment {
                         // onNext
                         this::showSnackbar,
                         // onError
-                        throwable -> Log.e(TAG, "Error retrieving snackbar text", throwable)));
+                        throwable -> Timber.e(throwable, "Error retrieving snackbar text")));
 
         // The ViewModel holds an observable containing the state of the UI.
         // subscribe to the emissions of the UiModel
@@ -129,7 +128,7 @@ public class AddEditTaskFragment extends BaseFragment {
                         // onNext
                         this::updateUi,
                         // onError
-                        throwable -> Log.e(TAG, "Error retrieving the task", throwable)));
+                        throwable -> Timber.e(throwable, "Error retrieving the task")));
 
     }
 
@@ -172,7 +171,7 @@ public class AddEditTaskFragment extends BaseFragment {
                             // nothing to do here
                         },
                         // onError
-                        throwable -> Log.e(TAG, "Error saving task", throwable)));
+                        throwable -> Timber.e(throwable, "Error saving task")));
     }
 
     private void showSnackbar(@StringRes Integer textId) {

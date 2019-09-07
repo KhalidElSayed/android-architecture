@@ -2,7 +2,6 @@ package com.example.android.architecture.blueprints.todoapp.ui.tasks.viewmodel;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.util.Log;
 
 import com.example.android.architecture.blueprints.todoapp.R;
 import com.example.android.architecture.blueprints.todoapp.data.model.Task;
@@ -30,6 +29,7 @@ import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.PublishSubject;
+import timber.log.Timber;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -40,7 +40,6 @@ public final class TasksViewModel extends BaseViewModel {
 
     @VisibleForTesting
     static final String FILTER_KEY = "filter";
-    private static final String TAG = TasksViewModel.class.getSimpleName();
 
     @NonNull
     private final TasksRepository mTasksRepository;
@@ -165,7 +164,7 @@ public final class TasksViewModel extends BaseViewModel {
                         () -> {
                         },
                         // on error
-                        throwable -> Log.e(TAG, "Error completing or activating task")
+                        throwable -> Timber.e(throwable, "Error completing or activating task")
                 );
     }
 

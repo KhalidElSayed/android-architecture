@@ -18,7 +18,6 @@ package com.example.android.architecture.blueprints.todoapp.ui.tasks.view;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -57,13 +56,12 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
+import timber.log.Timber;
 
 /**
  * Display a grid of {@link Task}s. User can choose to view all, active or completed tasks.
  */
 public class TasksFragment extends BaseFragment {
-
-    private static final String TAG = TasksFragment.class.getSimpleName();
 
     private TasksAdapter mListAdapter;
 
@@ -184,7 +182,7 @@ public class TasksFragment extends BaseFragment {
                         //onNext
                         this::updateView,
                         //onError
-                        error -> Log.e(TAG, "Error loading tasks", error)
+                        error -> Timber.e(error, "Error loading tasks")
                 ));
 
         // subscribe to the emissions of the snackbar text
@@ -196,7 +194,7 @@ public class TasksFragment extends BaseFragment {
                         //onNext
                         this::showSnackbar,
                         //onError
-                        error -> Log.d(TAG, "Error showing snackbar", error)
+                        error -> Timber.d(error, "Error showing snackbar")
                 ));
 
         // subscribe to the emissions of the loading indicator visibility
@@ -208,7 +206,7 @@ public class TasksFragment extends BaseFragment {
                         //onNext
                         this::setLoadingIndicatorVisibility,
                         //onError
-                        error -> Log.d(TAG, "Error showing loading indicator", error)
+                        error -> Timber.d(error, "Error showing loading indicator")
                 ));
     }
 
@@ -274,7 +272,7 @@ public class TasksFragment extends BaseFragment {
                             // nothing to do here
                         },
                         //onError
-                        error -> Log.d(TAG, "Error clearing completed tasks", error)
+                        error -> Timber.d(error, "Error clearing completed tasks")
                 ));
     }
 
@@ -288,7 +286,7 @@ public class TasksFragment extends BaseFragment {
                             // nothing to do here
                         },
                         //onError
-                        error -> Log.d(TAG, "Error refreshing tasks", error)
+                        error -> Timber.d(error, "Error refreshing tasks")
                 ));
     }
 

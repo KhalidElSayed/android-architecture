@@ -16,7 +16,6 @@
 package com.example.android.architecture.blueprints.todoapp.ui.statistics.view;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,13 +36,12 @@ import androidx.lifecycle.ViewModelProviders;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
+import timber.log.Timber;
 
 /**
  * Main UI for the statistics screen.
  */
 public class StatisticsFragment extends BaseFragment {
-
-    private static final String TAG = StatisticsFragment.class.getSimpleName();
 
     private TextView mStatisticsTV;
 
@@ -100,7 +98,7 @@ public class StatisticsFragment extends BaseFragment {
                         // onNext
                         this::updateStatistics,
                         // onError
-                        throwable -> Log.e(TAG, "Error retrieving statistics text", throwable)));
+                        throwable -> Timber.e(throwable, "Error retrieving statistics text")));
     }
 
     private void unbindViewModel() {
