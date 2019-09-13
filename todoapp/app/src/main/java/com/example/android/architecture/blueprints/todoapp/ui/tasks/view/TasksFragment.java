@@ -46,6 +46,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.appcompat.widget.PopupMenu;
@@ -53,6 +54,8 @@ import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
@@ -63,19 +66,24 @@ import timber.log.Timber;
  */
 public class TasksFragment extends BaseFragment {
 
+    @BindView(R.id.noTasks)
+    View mNoTasksView;
+    @BindView(R.id.noTasksIcon)
+    ImageView mNoTaskIcon;
+    @BindView(R.id.noTasksMain)
+    TextView mNoTaskMainView;
+    @BindView(R.id.noTasksAdd)
+    TextView mNoTaskAddView;
+    @BindView(R.id.tasksLL)
+    LinearLayout mTasksView;
+    @BindView(R.id.filteringLabel)
+    TextView mFilteringLabelView;
+    @BindView(R.id.tasks_list)
+    RecyclerView recyclerView;
+    @BindView(R.id.refresh_layout)
+    ScrollChildSwipeRefreshLayout swipeRefreshLayout;
+
     private TasksAdapter mListAdapter;
-
-    private View mNoTasksView;
-
-    private ImageView mNoTaskIcon;
-
-    private TextView mNoTaskMainView;
-
-    private TextView mNoTaskAddView;
-
-    private LinearLayout mTasksView;
-
-    private TextView mFilteringLabelView;
 
     @Inject
     ViewModelFactory viewModelFactory;
@@ -109,26 +117,28 @@ public class TasksFragment extends BaseFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.tasks_frag, container, false);
+        View rootView = inflater.inflate(R.layout.tasks_frag, container, false);
+        ButterKnife.bind(this, rootView);
+        setHasOptionsMenu(true);
+
+        return rootView;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
         mListAdapter = new TasksAdapter();
 
         // Set up tasks view
-        RecyclerView recyclerView = root.findViewById(R.id.tasks_list);
         recyclerView.setAdapter(mListAdapter);
-        mFilteringLabelView = root.findViewById(R.id.filteringLabel);
-        mTasksView = root.findViewById(R.id.tasksLL);
 
-        setupNoTasksView(root);
+        setupNoTasksView();
         setupFabButton();
-        setupSwipeRefreshLayout(root, recyclerView);
-
-        setHasOptionsMenu(true);
+        setupSwipeRefreshLayout(recyclerView);
 
         mViewModel = ViewModelProviders.of(this, viewModelFactory).get(TasksViewModel.class);
         mViewModel.restoreState(savedInstanceState);
-
-        return root;
     }
 
     @Override
@@ -231,18 +241,11 @@ public class TasksFragment extends BaseFragment {
         setFilterLabel(model.getFilterResId());
     }
 
-    private void setupNoTasksView(View root) {
-        mNoTasksView = root.findViewById(R.id.noTasks);
-        mNoTaskIcon = root.findViewById(R.id.noTasksIcon);
-        mNoTaskMainView = root.findViewById(R.id.noTasksMain);
-        mNoTaskAddView = root.findViewById(R.id.noTasksAdd);
+    private void setupNoTasksView() {
         mNoTaskAddView.setOnClickListener(__ -> mViewModel.addNewTask());
     }
 
-    private void setupSwipeRefreshLayout(View root, RecyclerView recyclerView) {
-        final ScrollChildSwipeRefreshLayout swipeRefreshLayout =
-                root.findViewById(R.id.refresh_layout);
-
+    private void setupSwipeRefreshLayout(RecyclerView recyclerView) {
         swipeRefreshLayout.setColorSchemeColors(
                 ContextCompat.getColor(getActivity(), R.color.colorPrimary),
                 ContextCompat.getColor(getActivity(), R.color.colorAccent),
@@ -278,7 +281,7 @@ public class TasksFragment extends BaseFragment {
 
     private void forceUpdate() {
         mDisposable.add(mViewModel.forceUpdateTasks()
-                .subscribeOn(Schedulers.computation())
+//                .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         //onCompleted

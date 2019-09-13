@@ -33,6 +33,8 @@ import javax.inject.Inject;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProviders;
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
@@ -43,7 +45,8 @@ import timber.log.Timber;
  */
 public class StatisticsFragment extends BaseFragment {
 
-    private TextView mStatisticsTV;
+    @BindView(R.id.statistics)
+    TextView mStatisticsTV;
 
     @Inject
     ViewModelFactory viewModelFactory;
@@ -65,12 +68,15 @@ public class StatisticsFragment extends BaseFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.statistics_frag, container, false);
-        mStatisticsTV = root.findViewById(R.id.statistics);
+        View rootView = inflater.inflate(R.layout.statistics_frag, container, false);
+        ButterKnife.bind(this, rootView);
+        return rootView;
+    }
 
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         mViewModel = ViewModelProviders.of(this, viewModelFactory).get(StatisticsViewModel.class);
-
-        return root;
     }
 
     @Override

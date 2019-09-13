@@ -27,11 +27,16 @@ import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
 import androidx.test.espresso.IdlingResource;
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 /**
  * Displays an add or edit task screen.
  */
 public class AddEditTaskActivity extends BaseActivity {
+
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
 
     public static final int REQUEST_ADD_TASK = 1;
     
@@ -39,9 +44,9 @@ public class AddEditTaskActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.addtask_act);
+        ButterKnife.bind(this);
 
         // Set up the toolbar.
-        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);

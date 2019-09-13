@@ -33,9 +33,12 @@ import com.google.android.material.snackbar.Snackbar;
 
 import javax.inject.Inject;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.lifecycle.ViewModelProviders;
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
@@ -46,13 +49,14 @@ import timber.log.Timber;
  */
 public class AddEditTaskFragment extends BaseFragment {
 
+    @BindView(R.id.add_task_title)
+    TextView mTitle;
+    @BindView(R.id.add_task_description)
+    TextView mDescription;
+
     public static final String ARGUMENT_EDIT_TASK_ID = "EDIT_TASK_ID";
     private static final String TASK_TITLE_KEY = "title";
     private static final String TASK_DESCRIPTION_KEY = "description";
-
-    private TextView mTitle;
-
-    private TextView mDescription;
 
     @Inject
     ViewModelFactory viewModelFactory;
@@ -81,17 +85,20 @@ public class AddEditTaskFragment extends BaseFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.addtask_frag, container, false);
-        mTitle = root.findViewById(R.id.add_task_title);
-        mDescription = root.findViewById(R.id.add_task_description);
+        View rootView = inflater.inflate(R.layout.addtask_frag, container, false);
+        ButterKnife.bind(this, rootView);
         setHasOptionsMenu(true);
+        return rootView;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
         setupFab();
 
         mViewModel = ViewModelProviders.of(this, viewModelFactory).get(AddEditTaskViewModel.class);
         restoreData(savedInstanceState);
-
-        return root;
     }
 
     @Override
@@ -141,8 +148,8 @@ public class AddEditTaskFragment extends BaseFragment {
         if (bundle == null) {
             return;
         }
-        /*mViewModel.setRestoredState(bundle.getString(TASK_TITLE_KEY),
-                bundle.getString(TASK_DESCRIPTION_KEY));*/
+        mViewModel.setRestoredState(bundle.getString(TASK_TITLE_KEY),
+                bundle.getString(TASK_DESCRIPTION_KEY));
     }
 
     @Override

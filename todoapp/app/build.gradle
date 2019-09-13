@@ -154,6 +154,10 @@ dependencies {
     annotationProcessor deps.dagger.compiler
     annotationProcessor deps.dagger.android_support_compiler
 
+    // Butterknife
+    implementation deps.butterknife.runtime
+    annotationProcessor deps.butterknife.compiler
+
     // Retrofit
     implementation deps.retrofit.runtime
     implementation deps.retrofit.gson

@@ -34,27 +34,33 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.test.espresso.IdlingResource;
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 public class TasksActivity extends BaseActivity {
 
-    private DrawerLayout mDrawerLayout;
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+    @BindView(R.id.drawer_layout)
+    DrawerLayout mDrawerLayout;
+    @BindView(R.id.nav_view)
+    NavigationView navigationView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.tasks_act);
+        ButterKnife.bind(this);
 
         // Set up the toolbar.
-        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar ab = getSupportActionBar();
         ab.setHomeAsUpIndicator(R.drawable.ic_menu);
         ab.setDisplayHomeAsUpEnabled(true);
 
         // Set up the navigation drawer.
-        mDrawerLayout = findViewById(R.id.drawer_layout);
         mDrawerLayout.setStatusBarBackground(R.color.colorPrimaryDark);
-        NavigationView navigationView = findViewById(R.id.nav_view);
         if (navigationView != null) {
             setupDrawerContent(navigationView);
         }
@@ -117,5 +123,4 @@ public class TasksActivity extends BaseActivity {
     public IdlingResource getCountingIdlingResource() {
         return EspressoIdlingResource.getIdlingResource();
     }
-
 }

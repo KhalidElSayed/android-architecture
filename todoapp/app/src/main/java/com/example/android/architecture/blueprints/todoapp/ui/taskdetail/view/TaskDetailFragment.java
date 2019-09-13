@@ -42,6 +42,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.lifecycle.ViewModelProviders;
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
@@ -52,16 +54,17 @@ import timber.log.Timber;
  */
 public class TaskDetailFragment extends BaseFragment {
 
+    @BindView(R.id.loading_progress)
+    TextView mLoadingProgress;
+    @BindView(R.id.task_detail_title)
+    TextView mDetailTitle;
+    @BindView(R.id.task_detail_description)
+    TextView mDetailDescription;
+    @BindView(R.id.task_detail_complete)
+    CheckBox mDetailCompleteStatus;
+
     @NonNull
     private static final String ARGUMENT_TASK_ID = "TASK_ID";
-
-    private TextView mLoadingProgress;
-
-    private TextView mDetailTitle;
-
-    private TextView mDetailDescription;
-
-    private CheckBox mDetailCompleteStatus;
 
     @Inject
     ViewModelFactory viewModelFactory;
@@ -90,18 +93,18 @@ public class TaskDetailFragment extends BaseFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.taskdetail_frag, container, false);
+        View rootView = inflater.inflate(R.layout.taskdetail_frag, container, false);
+        ButterKnife.bind(this, rootView);
         setHasOptionsMenu(true);
-        mLoadingProgress = root.findViewById(R.id.loading_progress);
-        mDetailTitle = root.findViewById(R.id.task_detail_title);
-        mDetailDescription = root.findViewById(R.id.task_detail_description);
-        mDetailCompleteStatus = root.findViewById(R.id.task_detail_complete);
+        return rootView;
+    }
 
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         setupFab();
 
         mViewModel = ViewModelProviders.of(this, viewModelFactory).get(TaskDetailViewModel.class);
-
-        return root;
     }
 
     @Override

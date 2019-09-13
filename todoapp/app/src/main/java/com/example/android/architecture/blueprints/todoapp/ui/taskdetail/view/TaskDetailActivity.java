@@ -26,11 +26,16 @@ import com.example.android.architecture.blueprints.todoapp.util.ActivityUtils;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 /**
  * Displays task details screen.
  */
 public class TaskDetailActivity extends BaseActivity {
+
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
 
     public static final int REQUEST_EDIT_TASK = 1;
     public static final String EXTRA_TASK_ID = "TASK_ID";
@@ -38,11 +43,10 @@ public class TaskDetailActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.taskdetail_act);
+        ButterKnife.bind(this);
 
         // Set up the toolbar.
-        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar ab = getSupportActionBar();
         ab.setDisplayHomeAsUpEnabled(true);
